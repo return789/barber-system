@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>消费记录 - 理发会员管理系统</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="/">理发会员管理系统</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">
+              <i class="fas fa-home me-1"></i> 首页
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/members">
+              <i class="fas fa-users me-1"></i> 会员管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/appointments">
+              <i class="fas fa-calendar-alt me-1"></i> 预约管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/transactions">
+              <i class="fas fa-receipt me-1"></i> 消费记录
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/orders">
+              <i class="fas fa-shopping-cart me-1"></i> 订单管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/balance">
+              <i class="fas fa-wallet me-1"></i> 余额管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/stats">
+              <i class="fas fa-chart-bar me-1"></i> 数据统计
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link logout-link" href="/logout" onclick="return confirmAction(this, '确定要退出登录吗？', 'logout');">
+              <i class="fas fa-sign-out-alt me-1"></i> 退出登录
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container tx-container">
+    <div class="tx-header">
+      <div>
+        <h1 class="tx-page-title">消费记录</h1>
+        <p class="tx-subtitle">管理会员消费记录，追踪每笔消费详情</p>
+      </div>
+      <div>
+        <a href="/transactions/add" class="btn btn-primary">
+          <i class="fas fa-plus me-1"></i> 添加消费记录
+        </a>
+      </div>
+    </div>
+
+    <%
+      var totalCount = transactions ? transactions.length : 0;
+      var totalAmount = transactions ? transactions.reduce(function(sum, t) { return sum + t.amount; }, 0) : 0;
+      var today = new Date().toISOString().split('T')[0];
+      var todayCount = transactions ? transactions.filter(function(t) { return t.date === today; }).length : 0;
+      var todayAmount = transactions ? transactions.filter(function(t) { return t.date === today; }).reduce(function(sum, t) { return sum + t.amount; }, 0) : 0;
+      var avgAmount = totalCount > 0 ? (totalAmount / totalCount) : 0;
+    %>
+
+    <div class="tx-kpi-row">
+      <div class="tx-kpi-card tx-kpi-gold">
+        <div class="tx-kpi-decoration"></div>
+        <div class="tx-kpi-icon">
+          <i class="fas fa-receipt"></i>
+        </div>
+        <div class="tx-kpi-content">
+          <span class="tx-kpi-label">总消费笔数</span>
+          <span class="tx-kpi-value"><%= totalCount %></span>
+        </div>
+      </div>
+      <div class="tx-kpi-card tx-kpi-emerald">
+        <div class="tx-kpi-decoration"></div>
+        <div class="tx-kpi-icon">
+          <i class="fas fa-coins"></i>
+        </div>
+        <div class="tx-kpi-content">
+          <span class="tx-kpi-label">累计消费金额</span>
+          <span class="tx-kpi-value">¥<%= totalAmount.toFixed(0) %></span>
+        </div>
+      </div>
+      <div class="tx-kpi-card tx-kpi-amber">
+        <div class="tx-kpi-decoration"></div>
+        <div class="tx-kpi-icon">
+          <i class="fas fa-calendar-day"></i>
+        </div>
+        <div class="tx-kpi-content">
+          <span class="tx-kpi-label">今日消费笔数</span>
+          <span class="tx-kpi-value"><%= todayCount %></span>
+        </div>
+      </div>
+      <div class="tx-kpi-card tx-kpi-rose">
+        <div class="tx-kpi-decoration"></div>
+        <div class="tx-kpi-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="tx-kpi-content">
+          <span class="tx-kpi-label">平均消费金额</span>
+          <span class="tx-kpi-value">¥<%= avgAmount.toFixed(0) %></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tx-toolbar">
+      <div class="tx-search-wrap">
+        <i class="fas fa-search tx-search-icon"></i>
+        <input type="text" class="form-control tx-search-input" id="tx_search" placeholder="搜索会员姓名、描述或金额...">
+      </div>
+      <div class="tx-filter-group">
+        <button class="tx-filter-btn active" data-filter="all">全部</button>
+        <button class="tx-filter-btn" data-filter="today">今天</button>
+        <button class="tx-filter-btn" data-filter="week">本周</button>
+        <button class="tx-filter-btn" data-filter="month">本月</button>
+      </div>
+    </div>
+
+    <div class="tx-table-card">
+      <div class="tx-table-wrap">
+        <table class="tx-table">
+          <thead>
+            <tr>
+              <th>编号</th>
+              <th>会员信息</th>
+              <th>消费金额</th>
+              <th>消费日期</th>
+              <th>描述</th>
+            </tr>
+          </thead>
+          <tbody id="tx_tbody">
+            <% if (transactions && transactions.length > 0) { %>
+              <% transactions.sort(function(a, b) { return parseInt(b.id) - parseInt(a.id); }).forEach(function(transaction, index) { %>
+                <tr class="tx-row" data-date="<%= transaction.date %>" data-search="<%= transaction.member_name %> <%= transaction.description %> <%= transaction.amount %>" style="animation-delay: <%= index * 0.05 %>s;">
+                  <td>
+                    <span class="tx-id-cell">#<%= transaction.id %></span>
+                  </td>
+                  <td>
+                    <div class="tx-member-cell">
+                      <div class="tx-avatar" style="background: linear-gradient(135deg, #C9A067, #B8860B);">
+                        <%= transaction.member_name ? transaction.member_name.charAt(0) : '?' %>
+                      </div>
+                      <div class="tx-member-info">
+                        <span class="tx-member-name"><%= transaction.member_name %></span>
+                        <span class="tx-member-id">ID: <%= transaction.member_id %></span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="tx-amount">¥<%= transaction.amount.toFixed(2) %></span>
+                  </td>
+                  <td>
+                    <span class="tx-date"><%= transaction.date %></span>
+                  </td>
+                  <td>
+                    <span class="tx-desc" title="<%= transaction.description %>"><%= transaction.description || '-' %></span>
+                  </td>
+                </tr>
+              <% }); %>
+            <% } %>
+            <tr id="tx_empty_row" style="display: <%= transactions && transactions.length > 0 ? 'none' : 'table-row' %>;">
+              <td colspan="5">
+                <div class="tx-empty">
+                  <div class="tx-empty-icon">
+                    <i class="fas fa-receipt"></i>
+                  </div>
+                  <div class="tx-empty-title">暂无消费记录</div>
+                  <div class="tx-empty-desc">点击上方按钮添加第一条消费记录</div>
+                  <a href="/transactions/add" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i> 添加消费记录
+                  </a>
+                </div>
+              </td>
+            </tr>
+            <tr id="tx_filter_empty_row" style="display: none;">
+              <td colspan="5">
+                <div class="tx-filter-empty">
+                  <i class="fas fa-search me-2"></i>未找到匹配的消费记录
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container text-center">
+      <p>&copy; 2026 理发会员管理系统</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var searchInput = document.getElementById('tx_search');
+      var filterBtns = document.querySelectorAll('.tx-filter-btn');
+      var rows = document.querySelectorAll('.tx-row');
+      var emptyRow = document.getElementById('tx_empty_row');
+      var filterEmptyRow = document.getElementById('tx_filter_empty_row');
+      var currentFilter = 'all';
+
+      function getDateRange(filter) {
+        var now = new Date();
+        var today = now.toISOString().split('T')[0];
+        if (filter === 'today') return { start: today, end: today };
+        if (filter === 'week') {
+          var weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          return { start: weekAgo.toISOString().split('T')[0], end: today };
+        }
+        if (filter === 'month') {
+          var monthStart = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-01';
+          return { start: monthStart, end: today };
+        }
+        return null;
+      }
+
+      function filterRows() {
+        var keyword = searchInput.value.trim().toLowerCase();
+        var dateRange = getDateRange(currentFilter);
+        var visibleCount = 0;
+
+        rows.forEach(function(row) {
+          var date = row.getAttribute('data-date');
+          var searchText = row.getAttribute('data-search').toLowerCase();
+          var matchFilter = !dateRange || (date >= dateRange.start && date <= dateRange.end);
+          var matchSearch = !keyword || searchText.indexOf(keyword) !== -1;
+          if (matchFilter && matchSearch) {
+            row.style.display = '';
+            visibleCount++;
+          } else {
+            row.style.display = 'none';
+          }
+        });
+
+        emptyRow.style.display = visibleCount === 0 && rows.length === 0 ? '' : 'none';
+        filterEmptyRow.style.display = visibleCount === 0 && rows.length > 0 ? '' : 'none';
+      }
+
+      searchInput.addEventListener('input', filterRows);
+
+      filterBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          filterBtns.forEach(function(b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          currentFilter = btn.getAttribute('data-filter');
+          filterRows();
+        });
+      });
+    });
+  </script>
+  <script src="/confirm.js"></script>
+</body>
+</html>

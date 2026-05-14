@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>余额管理 - 理发会员管理系统</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="/">理发会员管理系统</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/"><i class="fas fa-home me-1"></i> 首页</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/members"><i class="fas fa-users me-1"></i> 会员管理</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/appointments"><i class="fas fa-calendar-alt me-1"></i> 预约管理</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/transactions"><i class="fas fa-receipt me-1"></i> 消费记录</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/orders"><i class="fas fa-shopping-cart me-1"></i> 订单管理</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/balance"><i class="fas fa-wallet me-1"></i> 余额管理</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/stats"><i class="fas fa-chart-bar me-1"></i> 数据统计</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link logout-link" href="/logout" onclick="return confirmAction(this, '确定要退出登录吗？', 'logout');"><i class="fas fa-sign-out-alt me-1"></i> 退出登录</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container balance-container">
+    <div class="balance-header">
+      <div>
+        <h1 class="balance-page-title">余额管理</h1>
+        <p class="balance-subtitle">管理会员余额，支持充值和扣费操作</p>
+      </div>
+      <div class="balance-header-actions">
+        <a href="/members" class="btn btn-secondary">
+          <i class="fas fa-arrow-left me-1"></i> 返回会员管理
+        </a>
+      </div>
+    </div>
+
+    <div class="balance-kpi-row">
+      <div class="balance-kpi-card balance-kpi-gold">
+        <div class="balance-kpi-decoration"></div>
+        <div class="balance-kpi-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="balance-kpi-content">
+          <span class="balance-kpi-label">会员总数</span>
+          <span class="balance-kpi-value"><%= balanceStats.totalMembers %></span>
+        </div>
+      </div>
+      <div class="balance-kpi-card balance-kpi-emerald">
+        <div class="balance-kpi-decoration"></div>
+        <div class="balance-kpi-icon">
+          <i class="fas fa-coins"></i>
+        </div>
+        <div class="balance-kpi-content">
+          <span class="balance-kpi-label">总余额</span>
+          <span class="balance-kpi-value">¥<%= (balanceStats.totalBalance || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
+        </div>
+      </div>
+      <div class="balance-kpi-card balance-kpi-rose">
+        <div class="balance-kpi-decoration"></div>
+        <div class="balance-kpi-icon">
+          <i class="fas fa-crown"></i>
+        </div>
+        <div class="balance-kpi-content">
+          <span class="balance-kpi-label">最高余额</span>
+          <span class="balance-kpi-value">¥<%= (balanceStats.maxBalance || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
+        </div>
+      </div>
+      <div class="balance-kpi-card balance-kpi-teal">
+        <div class="balance-kpi-decoration"></div>
+        <div class="balance-kpi-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="balance-kpi-content">
+          <span class="balance-kpi-label">平均余额</span>
+          <span class="balance-kpi-value">¥<%= (balanceStats.avgBalance || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="balance-toolbar">
+      <div class="balance-search-input-wrap">
+        <i class="fas fa-search balance-search-icon"></i>
+        <input type="text" id="balanceSearch" class="form-control balance-search-input" placeholder="搜索会员姓名或电话...">
+      </div>
+      <button id="balanceSortBtn" class="balance-sort-btn" title="按余额排序">
+        <i class="fas fa-sort-amount-down" id="balanceSortIcon"></i>
+        <span id="balanceSortLabel">余额排序</span>
+      </button>
+    </div>
+
+    <div class="balance-table-card">
+      <% if (members && members.length > 0) { %>
+      <div class="balance-table-wrap">
+        <table class="table table-hover balance-table" id="balanceTable">
+          <thead>
+            <tr>
+              <th>会员信息</th>
+              <th>联系电话</th>
+              <th>当前余额</th>
+              <th>余额状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% members.forEach((member, index) => { %>
+            <tr class="balance-row" data-balance="<%= member.balance || 0 %>" style="animation-delay: <%= 0.05 * index %>s">
+              <td>
+                <div class="balance-member-cell">
+                  <div class="balance-avatar" style="background: <%= ['#C9A067', '#7BA87B', '#B86A6A', '#7B9FB8', '#B8A0E0'][member.id % 5] %>">
+                    <%= member.name.charAt(0) %>
+                  </div>
+                  <div class="balance-member-info">
+                    <span class="balance-member-name"><%= member.name %></span>
+                    <span class="balance-member-id">NO.<%= member.id %></span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="balance-phone"><i class="fas fa-phone-alt me-1"></i><%= member.phone %></span>
+              </td>
+              <td>
+                <span class="balance-amount<% if ((member.balance || 0) > 0 && (member.balance || 0) < 100) { %> balance-amount-low<% } %>">¥<%= (member.balance || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
+              </td>
+              <td>
+                <% if ((member.balance || 0) >= 500) { %>
+                <span class="balance-status balance-status-high"><i class="fas fa-circle me-1"></i>充足</span>
+                <% } else if ((member.balance || 0) >= 100) { %>
+                <span class="balance-status balance-status-mid"><i class="fas fa-circle me-1"></i>正常</span>
+                <% } else if ((member.balance || 0) > 0) { %>
+                <span class="balance-status balance-status-low"><i class="fas fa-circle me-1"></i>偏低</span>
+                <% } else { %>
+                <span class="balance-status balance-status-zero"><i class="fas fa-circle me-1"></i>零余额</span>
+                <% } %>
+              </td>
+              <td>
+                <a href="/balance/edit/<%= member.id %>" class="btn btn-primary btn-sm balance-action-btn">
+                  <i class="fas fa-wallet me-1"></i> 修改余额
+                </a>
+              </td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+
+      <% if (pagination && pagination.totalPages > 1) { %>
+      <div class="balance-pagination-wrap">
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            <li class="page-item <%= pagination.page === 1 ? 'disabled' : '' %>">
+              <a class="page-link" href="/balance?page=1"><i class="fas fa-angle-double-left"></i></a>
+            </li>
+            <li class="page-item <%= pagination.page === 1 ? 'disabled' : '' %>">
+              <a class="page-link" href="/balance?page=<%= pagination.page - 1 %>"><i class="fas fa-angle-left"></i></a>
+            </li>
+            <% for (let i = Math.max(1, pagination.page - 2); i <= Math.min(pagination.totalPages, pagination.page + 2); i++) { %>
+            <li class="page-item <%= i === pagination.page ? 'active' : '' %>">
+              <a class="page-link" href="/balance?page=<%= i %>"><%= i %></a>
+            </li>
+            <% } %>
+            <li class="page-item <%= pagination.page === pagination.totalPages ? 'disabled' : '' %>">
+              <a class="page-link" href="/balance?page=<%= pagination.page + 1 %>"><i class="fas fa-angle-right"></i></a>
+            </li>
+            <li class="page-item <%= pagination.page === pagination.totalPages ? 'disabled' : '' %>">
+              <a class="page-link" href="/balance?page=<%= pagination.totalPages %>"><i class="fas fa-angle-double-right"></i></a>
+            </li>
+          </ul>
+        </nav>
+        <div class="balance-pagination-info">
+          共 <%= pagination.totalMembers %> 条记录，第 <%= pagination.page %> / <%= pagination.totalPages %> 页
+        </div>
+      </div>
+      <% } %>
+
+      <% } else { %>
+      <div class="balance-empty">
+        <div class="balance-empty-icon">
+          <i class="fas fa-wallet"></i>
+        </div>
+        <h5 class="balance-empty-title">暂无会员记录</h5>
+        <p class="balance-empty-desc">请先添加会员后再管理余额</p>
+        <a href="/members/add" class="btn btn-primary"><i class="fas fa-plus me-1"></i> 添加会员</a>
+      </div>
+      <% } %>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container text-center">
+      <p>&copy; 2026 理发会员管理系统</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function() {
+      var sortState = 'none';
+      var sortBtn = document.getElementById('balanceSortBtn');
+      var sortIcon = document.getElementById('balanceSortIcon');
+      var sortLabel = document.getElementById('balanceSortLabel');
+      var tbody = document.querySelector('#balanceTable tbody');
+
+      function getRows() {
+        return Array.prototype.slice.call(tbody.querySelectorAll('.balance-row'));
+      }
+
+      function sortRows(direction) {
+        var rows = getRows();
+        rows.sort(function(a, b) {
+          var ba = parseFloat(a.getAttribute('data-balance')) || 0;
+          var bb = parseFloat(b.getAttribute('data-balance')) || 0;
+          if (direction === 'desc') return bb - ba;
+          return ba - bb;
+        });
+        rows.forEach(function(row) {
+          tbody.appendChild(row);
+        });
+      }
+
+      sortBtn.addEventListener('click', function() {
+        if (sortState === 'none' || sortState === 'asc') {
+          sortState = 'desc';
+          sortIcon.className = 'fas fa-sort-amount-down';
+          sortLabel.textContent = '余额降序';
+          sortBtn.classList.add('active');
+        } else {
+          sortState = 'asc';
+          sortIcon.className = 'fas fa-sort-amount-up';
+          sortLabel.textContent = '余额升序';
+          sortBtn.classList.add('active');
+        }
+        sortRows(sortState);
+      });
+
+      document.getElementById('balanceSearch').addEventListener('input', function(e) {
+        var keyword = e.target.value.toLowerCase().trim();
+        var rows = document.querySelectorAll('#balanceTable tbody .balance-row');
+        rows.forEach(function(row) {
+          var name = row.querySelector('.balance-member-name').textContent.toLowerCase();
+          var phone = row.querySelector('.balance-phone').textContent.replace(/\s/g, '');
+          var match = !keyword || name.includes(keyword) || phone.includes(keyword);
+          row.style.display = match ? '' : 'none';
+        });
+      });
+    })();
+  </script>
+  <script src="/confirm.js"></script>
+</body>
+</html>

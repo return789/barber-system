@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>会员管理 - 理发会员管理系统</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="/">理发会员管理系统</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">
+              <i class="fas fa-home me-1"></i> 首页
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/members">
+              <i class="fas fa-users me-1"></i> 会员管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/appointments">
+              <i class="fas fa-calendar-alt me-1"></i> 预约管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/transactions">
+              <i class="fas fa-receipt me-1"></i> 消费记录
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/orders">
+              <i class="fas fa-shopping-cart me-1"></i> 订单管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/balance">
+              <i class="fas fa-wallet me-1"></i> 余额管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/stats">
+              <i class="fas fa-chart-bar me-1"></i> 数据统计
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link logout-link" href="/logout" onclick="return confirmAction(this, '确定要退出登录吗？', 'logout');">
+              <i class="fas fa-sign-out-alt me-1"></i> 退出登录
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container members-container">
+    <div class="members-header">
+      <div>
+        <h1 class="members-page-title">会员管理</h1>
+        <p class="members-subtitle">管理会员信息，追踪等级分布与资产概况</p>
+      </div>
+      <div class="members-header-actions">
+        <a href="/members/add" class="btn btn-primary members-add-btn">
+          <i class="fas fa-plus me-1"></i> 添加会员
+        </a>
+      </div>
+    </div>
+
+    <div class="members-kpi-row">
+      <div class="members-kpi-card members-kpi-gold">
+        <div class="members-kpi-decoration"></div>
+        <div class="members-kpi-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="members-kpi-content">
+          <span class="members-kpi-label">会员总数</span>
+          <span class="members-kpi-value"><%= memberStats.totalMembers %></span>
+        </div>
+      </div>
+      <div class="members-kpi-card members-kpi-emerald">
+        <div class="members-kpi-decoration"></div>
+        <div class="members-kpi-icon">
+          <i class="fas fa-wallet"></i>
+        </div>
+        <div class="members-kpi-content">
+          <span class="members-kpi-label">总余额</span>
+          <span class="members-kpi-value">¥<%= (memberStats.totalBalance || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
+        </div>
+      </div>
+      <div class="members-kpi-card members-kpi-amber">
+        <div class="members-kpi-decoration"></div>
+        <div class="members-kpi-icon">
+          <i class="fas fa-coins"></i>
+        </div>
+        <div class="members-kpi-content">
+          <span class="members-kpi-label">总积分</span>
+          <span class="members-kpi-value"><%= (memberStats.totalPoints || 0).toLocaleString('zh-CN') %></span>
+        </div>
+      </div>
+      <div class="members-kpi-card members-kpi-rose">
+        <div class="members-kpi-decoration"></div>
+        <div class="members-kpi-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="members-kpi-content">
+          <span class="members-kpi-label">人均余额</span>
+          <span class="members-kpi-value">¥<%= (memberStats.avgBalance || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="members-secondary-row">
+      <div class="members-mini-card">
+        <div class="members-mini-icon members-mini-icon-normal">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="members-mini-content">
+          <span class="members-mini-label">普通会员</span>
+          <span class="members-mini-value"><%= memberStats.normalCount %></span>
+        </div>
+      </div>
+      <div class="members-mini-card">
+        <div class="members-mini-icon members-mini-icon-gold">
+          <i class="fas fa-crown"></i>
+        </div>
+        <div class="members-mini-content">
+          <span class="members-mini-label">黄金会员</span>
+          <span class="members-mini-value"><%= memberStats.goldCount %></span>
+        </div>
+      </div>
+      <div class="members-mini-card">
+        <div class="members-mini-icon members-mini-icon-diamond">
+          <i class="fas fa-gem"></i>
+        </div>
+        <div class="members-mini-content">
+          <span class="members-mini-label">钻石会员</span>
+          <span class="members-mini-value"><%= memberStats.diamondCount %></span>
+        </div>
+      </div>
+      <div class="members-mini-card">
+        <div class="members-mini-icon members-mini-icon-avg">
+          <i class="fas fa-balance-scale"></i>
+        </div>
+        <div class="members-mini-content">
+          <span class="members-mini-label">等级分布</span>
+          <span class="members-mini-value"><%= memberStats.totalMembers > 0 ? Math.round((memberStats.goldCount + memberStats.diamondCount) / memberStats.totalMembers * 100) : 0 %>% 高级</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="members-toolbar">
+      <div class="members-search-wrap">
+        <i class="fas fa-search members-search-icon"></i>
+        <input type="text" class="form-control members-search-input" id="memberSearch" placeholder="搜索姓名或电话..." autocomplete="off">
+      </div>
+      <div class="members-filter-group">
+        <button class="members-filter-btn active" data-filter="all">全部</button>
+        <button class="members-filter-btn" data-filter="普通">普通</button>
+        <button class="members-filter-btn" data-filter="黄金">黄金</button>
+        <button class="members-filter-btn" data-filter="钻石">钻石</button>
+      </div>
+    </div>
+
+    <div class="members-table-card">
+      <div class="members-table-wrap">
+        <table class="table members-table" id="membersTable">
+          <thead>
+            <tr>
+              <th>会员</th>
+              <th>电话</th>
+              <th>生日</th>
+              <th>等级</th>
+              <th>积分</th>
+              <th>余额</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="membersTableBody">
+            <% if (members && members.length > 0) { %>
+              <% members.forEach((member, index) => { %>
+                <tr class="members-row" data-level="<%= member.membership_level %>" data-name="<%= member.name %>" data-phone="<%= member.phone %>" style="animation-delay: <%= index * 0.04 %>s">
+                  <td>
+                    <div class="members-member-cell">
+                      <div class="members-avatar members-avatar-<%= member.membership_level === '普通' ? 'normal' : member.membership_level === '黄金' ? 'gold' : member.membership_level === '钻石' ? 'diamond' : 'default' %>">
+                        <%= member.name.charAt(0) %>
+                      </div>
+                      <div class="members-member-info">
+                        <span class="members-member-name"><%= member.name %></span>
+                        <span class="members-member-id">#<%= member.id %></span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="members-phone">
+                      <i class="fas fa-phone me-1"></i><%= member.phone %>
+                    </span>
+                  </td>
+                  <td>
+                    <span class="members-date"><%= member.birthdate || '—' %></span>
+                  </td>
+                  <td>
+                    <span class="level-badge level-badge-<%= member.membership_level === '普通' ? 'normal' : member.membership_level === '黄金' ? 'gold' : member.membership_level === '钻石' ? 'diamond' : 'default' %>">
+                      <i class="fas <%= member.membership_level === '普通' ? 'fa-user' : member.membership_level === '黄金' ? 'fa-crown' : member.membership_level === '钻石' ? 'fa-gem' : 'fa-star' %>"></i>
+                      <%= member.membership_level %>
+                    </span>
+                  </td>
+                  <td>
+                    <span class="members-points"><%= member.points %></span>
+                  </td>
+                  <td>
+                    <span class="members-amount">¥<%= (member.balance || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
+                  </td>
+                  <td>
+                    <div class="members-action-group">
+                      <a href="/members/edit/<%= member.id %>" class="btn btn-primary btn-sm members-action-btn">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <a href="/balance/edit/<%= member.id %>" class="btn btn-success btn-sm members-action-btn">
+                        <i class="fas fa-wallet"></i>
+                      </a>
+                      <a href="/members/delete/<%= member.id %>" class="btn btn-danger btn-sm members-action-btn" onclick="return confirmAction(this, '确定要删除这个会员吗？', 'danger');">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              <% }); %>
+            <% } %>
+          </tbody>
+        </table>
+
+        <% if (!members || members.length === 0) { %>
+          <div class="members-empty">
+            <div class="members-empty-icon">
+              <i class="fas fa-users-slash"></i>
+            </div>
+            <h5 class="members-empty-title">暂无会员记录</h5>
+            <p class="members-empty-desc">点击上方按钮添加第一位会员</p>
+            <a href="/members/add" class="btn btn-primary">
+              <i class="fas fa-plus me-1"></i> 添加会员
+            </a>
+          </div>
+        <% } %>
+
+        <div class="members-filter-empty" id="filterEmpty" style="display:none;">
+          <i class="fas fa-filter me-2"></i> 没有匹配的会员
+        </div>
+      </div>
+
+      <% if (pagination && pagination.totalPages > 1) { %>
+      <div class="members-pagination-wrap">
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center">
+            <li class="page-item <%= pagination.page === 1 ? 'disabled' : '' %>">
+              <a class="page-link" href="/members?page=1" aria-label="First">
+                <span aria-hidden="true">&laquo;&laquo;</span>
+              </a>
+            </li>
+            <li class="page-item <%= pagination.page === 1 ? 'disabled' : '' %>">
+              <a class="page-link" href="/members?page=<%= pagination.page - 1 %>">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <% for (let i = Math.max(1, pagination.page - 2); i <= Math.min(pagination.totalPages, pagination.page + 2); i++) { %>
+            <li class="page-item <%= i === pagination.page ? 'active' : '' %>">
+              <a class="page-link" href="/members?page=<%= i %>"><%= i %></a>
+            </li>
+            <% } %>
+            <li class="page-item <%= pagination.page === pagination.totalPages ? 'disabled' : '' %>">
+              <a class="page-link" href="/members?page=<%= pagination.page + 1 %>">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+            <li class="page-item <%= pagination.page === pagination.totalPages ? 'disabled' : '' %>">
+              <a class="page-link" href="/members?page=<%= pagination.totalPages %>">
+                <span aria-hidden="true">&raquo;&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="members-pagination-info">
+          共 <%= pagination.totalMembers %> 条记录，第 <%= pagination.page %> / <%= pagination.totalPages %> 页
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container text-center">
+      <p>&copy; 2026 理发会员管理系统</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function() {
+      var currentFilter = 'all';
+      var searchTerm = '';
+
+      function filterRows() {
+        var rows = document.querySelectorAll('.members-row');
+        var visibleCount = 0;
+
+        rows.forEach(function(row) {
+          var level = row.getAttribute('data-level');
+          var name = row.getAttribute('data-name').toLowerCase();
+          var phone = row.getAttribute('data-phone');
+
+          var matchLevel = currentFilter === 'all' || level === currentFilter;
+          var matchSearch = !searchTerm || name.indexOf(searchTerm) !== -1 || phone.indexOf(searchTerm) !== -1;
+
+          if (matchLevel && matchSearch) {
+            row.style.display = '';
+            visibleCount++;
+          } else {
+            row.style.display = 'none';
+          }
+        });
+
+        var filterEmpty = document.getElementById('filterEmpty');
+        var membersEmpty = document.querySelector('.members-empty');
+
+        if (visibleCount === 0 && rows.length > 0) {
+          filterEmpty.style.display = 'flex';
+        } else {
+          filterEmpty.style.display = 'none';
+        }
+
+        if (membersEmpty) {
+          membersEmpty.style.display = rows.length === 0 ? '' : 'none';
+        }
+      }
+
+      document.querySelectorAll('.members-filter-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.members-filter-btn').forEach(function(b) { b.classList.remove('active'); });
+          this.classList.add('active');
+          currentFilter = this.getAttribute('data-filter');
+          filterRows();
+        });
+      });
+
+      var searchInput = document.getElementById('memberSearch');
+      var searchTimer;
+      searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(function() {
+          searchTerm = searchInput.value.trim().toLowerCase();
+          filterRows();
+        }, 200);
+      });
+    })();
+  </script>
+  <script src="/confirm.js"></script>
+</body>
+</html>

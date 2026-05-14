@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>订单管理 - 理发会员管理系统</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="/">理发会员管理系统</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">
+              <i class="fas fa-home me-1"></i> 首页
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/members">
+              <i class="fas fa-users me-1"></i> 会员管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/appointments">
+              <i class="fas fa-calendar-alt me-1"></i> 预约管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/transactions">
+              <i class="fas fa-receipt me-1"></i> 消费记录
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/orders">
+              <i class="fas fa-shopping-cart me-1"></i> 订单管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/balance">
+              <i class="fas fa-wallet me-1"></i> 余额管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/stats">
+              <i class="fas fa-chart-bar me-1"></i> 数据统计
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link logout-link" href="/logout" onclick="return confirmAction(this, '确定要退出登录吗？', 'logout');">
+              <i class="fas fa-sign-out-alt me-1"></i> 退出登录
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container orders-container">
+    <div class="orders-header">
+      <div>
+        <h1 class="orders-page-title">订单管理</h1>
+        <p class="orders-subtitle">管理会员订单，查看订单详情与处理进度</p>
+      </div>
+      <div>
+        <a href="/orders/add" class="btn btn-primary">
+          <i class="fas fa-plus me-1"></i> 添加订单
+        </a>
+      </div>
+    </div>
+
+    <%
+      var totalCount = transactions ? transactions.length : 0;
+      var pendingCount = transactions ? transactions.filter(function(t) { return t.status === '待处理'; }).length : 0;
+      var completedCount = transactions ? transactions.filter(function(t) { return t.status === '已处理'; }).length : 0;
+      var cancelledCount = transactions ? transactions.filter(function(t) { return t.status === '已取消'; }).length : 0;
+      var totalAmount = transactions ? transactions.filter(function(t) { return t.status !== '已取消'; }).reduce(function(sum, t) { return sum + t.amount; }, 0) : 0;
+    %>
+
+    <div class="orders-kpi-row">
+      <div class="orders-kpi-card orders-kpi-gold">
+        <div class="orders-kpi-decoration"></div>
+        <div class="orders-kpi-icon">
+          <i class="fas fa-receipt"></i>
+        </div>
+        <div class="orders-kpi-content">
+          <span class="orders-kpi-label">全部订单</span>
+          <span class="orders-kpi-value"><%= totalCount %></span>
+        </div>
+      </div>
+      <div class="orders-kpi-card orders-kpi-amber">
+        <div class="orders-kpi-decoration"></div>
+        <div class="orders-kpi-icon">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="orders-kpi-content">
+          <span class="orders-kpi-label">待处理</span>
+          <span class="orders-kpi-value"><%= pendingCount %></span>
+        </div>
+      </div>
+      <div class="orders-kpi-card orders-kpi-emerald">
+        <div class="orders-kpi-decoration"></div>
+        <div class="orders-kpi-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="orders-kpi-content">
+          <span class="orders-kpi-label">已处理</span>
+          <span class="orders-kpi-value"><%= completedCount %></span>
+        </div>
+      </div>
+      <div class="orders-kpi-card orders-kpi-rose">
+        <div class="orders-kpi-decoration"></div>
+        <div class="orders-kpi-icon">
+          <i class="fas fa-times-circle"></i>
+        </div>
+        <div class="orders-kpi-content">
+          <span class="orders-kpi-label">已取消</span>
+          <span class="orders-kpi-value"><%= cancelledCount %></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="orders-toolbar">
+      <div class="orders-search-wrap">
+        <i class="fas fa-search orders-search-icon"></i>
+        <input type="text" class="form-control orders-search-input" id="order_search" placeholder="搜索订单编号、会员姓名或描述...">
+      </div>
+      <div class="orders-filter-group">
+        <button class="orders-filter-btn active" data-filter="all">全部</button>
+        <button class="orders-filter-btn" data-filter="待处理">待处理</button>
+        <button class="orders-filter-btn" data-filter="已处理">已处理</button>
+        <button class="orders-filter-btn" data-filter="已取消">已取消</button>
+      </div>
+    </div>
+
+    <div class="orders-table-card">
+      <div class="orders-table-wrap">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>订单编号</th>
+              <th>会员信息</th>
+              <th>金额</th>
+              <th>日期</th>
+              <th>描述</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="orders_tbody">
+            <% if (transactions && transactions.length > 0) { %>
+              <% transactions.sort(function(a, b) { return parseInt(b.id) - parseInt(a.id); }).forEach(function(transaction, index) { %>
+                <tr class="orders-row" data-status="<%= transaction.status %>" data-search="<%= transaction.id %> <%= transaction.member_name %> <%= transaction.description %>" style="animation-delay: <%= index * 0.05 %>s;">
+                  <td>
+                    <span class="orders-id-cell">#<%= transaction.id %></span>
+                  </td>
+                  <td>
+                    <div class="orders-member-cell">
+                      <div class="orders-avatar" style="background: linear-gradient(135deg, #C9A067, #B8860B);">
+                        <%= transaction.member_name ? transaction.member_name.charAt(0) : '?' %>
+                      </div>
+                      <div class="orders-member-info">
+                        <span class="orders-member-name"><%= transaction.member_name %></span>
+                        <span class="orders-member-id">ID: <%= transaction.member_id %></span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="orders-amount">¥<%= transaction.amount.toFixed(2) %></span>
+                  </td>
+                  <td>
+                    <span class="orders-date"><%= transaction.date %></span>
+                  </td>
+                  <td>
+                    <span class="orders-desc" title="<%= transaction.description %>"><%= transaction.description || '-' %></span>
+                  </td>
+                  <td>
+                    <% if (transaction.status === '待处理') { %>
+                      <span class="orders-status orders-status-pending">
+                        <i class="fas fa-circle"></i> 待处理
+                      </span>
+                    <% } else if (transaction.status === '已取消') { %>
+                      <span class="orders-status orders-status-cancelled">
+                        <i class="fas fa-circle"></i> 已取消
+                      </span>
+                    <% } else { %>
+                      <span class="orders-status orders-status-completed">
+                        <i class="fas fa-circle"></i> 已处理
+                      </span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <div class="d-flex gap-2 justify-content-center">
+                      <% if (transaction.status === '待处理') { %>
+                        <a href="/orders/process/<%= transaction.id %>" class="btn btn-success btn-sm orders-action-btn">
+                          <i class="fas fa-credit-card me-1"></i> 处理
+                        </a>
+                        <a href="/orders/cancel/<%= transaction.id %>" class="btn btn-danger btn-sm orders-action-btn" onclick="return confirmAction(this, '确定要取消这个订单吗？', 'danger');">
+                          <i class="fas fa-times me-1"></i> 取消
+                        </a>
+                      <% } else if (transaction.status === '已取消') { %>
+                        <span class="text-muted" style="font-size: 0.85rem;">已取消</span>
+                      <% } else { %>
+                        <span class="text-muted" style="font-size: 0.85rem;">已完成</span>
+                      <% } %>
+                    </div>
+                  </td>
+                </tr>
+              <% }); %>
+            <% } %>
+            <tr id="orders_empty_row" style="display: <%= transactions && transactions.length > 0 ? 'none' : 'table-row' %>;">
+              <td colspan="7">
+                <div class="orders-empty">
+                  <div class="orders-empty-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                  </div>
+                  <div class="orders-empty-title">暂无订单记录</div>
+                  <div class="orders-empty-desc">点击上方按钮添加第一个订单</div>
+                  <a href="/orders/add" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i> 添加订单
+                  </a>
+                </div>
+              </td>
+            </tr>
+            <tr id="orders_filter_empty_row" style="display: none;">
+              <td colspan="7">
+                <div class="orders-filter-empty">
+                  <span>无</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container text-center">
+      <p>&copy; 2026 理发会员管理系统</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var searchInput = document.getElementById('order_search');
+      var filterBtns = document.querySelectorAll('.orders-filter-btn');
+      var rows = document.querySelectorAll('.orders-row');
+      var currentFilter = 'all';
+
+      searchInput.addEventListener('input', function() {
+        filterRows();
+      });
+
+      filterBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          filterBtns.forEach(function(b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          currentFilter = btn.getAttribute('data-filter');
+          filterRows();
+        });
+      });
+
+      function filterRows() {
+        var keyword = searchInput.value.trim().toLowerCase();
+        rows.forEach(function(row) {
+          var status = row.getAttribute('data-status');
+          var searchText = row.getAttribute('data-search').toLowerCase();
+          var matchFilter = currentFilter === 'all' || status === currentFilter;
+          var matchSearch = !keyword || searchText.indexOf(keyword) !== -1;
+          if (matchFilter && matchSearch) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      }
+    });
+  </script>
+  <script src="/confirm.js"></script>
+</body>
+</html>

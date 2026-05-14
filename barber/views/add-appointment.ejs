@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>添加预约 - 理发会员管理系统</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="/">理发会员管理系统</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">
+              <i class="fas fa-home me-1"></i> 首页
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/members">
+              <i class="fas fa-users me-1"></i> 会员管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/appointments">
+              <i class="fas fa-calendar-alt me-1"></i> 预约管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/transactions">
+              <i class="fas fa-receipt me-1"></i> 消费记录
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/orders">
+              <i class="fas fa-shopping-cart me-1"></i> 订单管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/balance">
+              <i class="fas fa-wallet me-1"></i> 余额管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/stats">
+              <i class="fas fa-chart-bar me-1"></i> 数据统计
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link logout-link" href="/logout" onclick="return confirmAction(this, '确定要退出登录吗？', 'logout');">
+              <i class="fas fa-sign-out-alt me-1"></i> 退出登录
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container appt-form-container">
+    <div class="appt-form-header">
+      <div>
+        <h1 class="appt-form-page-title">添加预约</h1>
+        <p class="appt-form-subtitle">为会员创建新的服务预约</p>
+      </div>
+      <div>
+        <a href="/appointments" class="btn btn-secondary">
+          <i class="fas fa-arrow-left me-1"></i> 返回列表
+        </a>
+      </div>
+    </div>
+
+    <div class="appt-form-layout">
+      <div class="appt-form-card">
+        <form action="/appointments/add" method="POST" id="apptForm">
+          <div class="appt-form-section">
+            <div class="appt-form-section-title">
+              <i class="fas fa-user"></i> 会员信息
+            </div>
+            <label class="appt-form-label">选择会员</label>
+            <div class="appt-form-search-wrap">
+              <i class="fas fa-search appt-form-search-icon"></i>
+              <input type="text" class="form-control appt-form-search-input" id="member_search" placeholder="搜索会员姓名或手机号..." autocomplete="off">
+              <div class="appt-form-search-results" id="member_results" style="display: none;"></div>
+            </div>
+            <input type="hidden" id="member_id" name="member_id" required>
+            <div id="selected_member" style="display: none;"></div>
+          </div>
+
+          <div class="appt-form-section">
+            <div class="appt-form-section-title">
+              <i class="fas fa-cut"></i> 服务项目
+            </div>
+            <label class="appt-form-label">选择服务</label>
+            <div class="appt-service-grid">
+              <div class="appt-service-option" data-service="理发">
+                <input type="radio" name="service" value="理发" id="svc_haircut">
+                <label for="svc_haircut" class="appt-service-card">
+                  <div class="appt-service-icon">
+                    <i class="fas fa-cut"></i>
+                  </div>
+                  <span class="appt-service-name">理发</span>
+                </label>
+              </div>
+              <div class="appt-service-option" data-service="烫发">
+                <input type="radio" name="service" value="烫发" id="svc_perm">
+                <label for="svc_perm" class="appt-service-card">
+                  <div class="appt-service-icon">
+                    <i class="fas fa-wind"></i>
+                  </div>
+                  <span class="appt-service-name">烫发</span>
+                </label>
+              </div>
+              <div class="appt-service-option" data-service="染发">
+                <input type="radio" name="service" value="染发" id="svc_color">
+                <label for="svc_color" class="appt-service-card">
+                  <div class="appt-service-icon">
+                    <i class="fas fa-palette"></i>
+                  </div>
+                  <span class="appt-service-name">染发</span>
+                </label>
+              </div>
+              <div class="appt-service-option" data-service="造型">
+                <input type="radio" name="service" value="造型" id="svc_style">
+                <label for="svc_style" class="appt-service-card">
+                  <div class="appt-service-icon">
+                    <i class="fas fa-magic"></i>
+                  </div>
+                  <span class="appt-service-name">造型</span>
+                </label>
+              </div>
+              <div class="appt-service-option" data-service="刮胡">
+                <input type="radio" name="service" value="刮胡" id="svc_shave">
+                <label for="svc_shave" class="appt-service-card">
+                  <div class="appt-service-icon">
+                    <i class="fas fa-user-tie"></i>
+                  </div>
+                  <span class="appt-service-name">刮胡</span>
+                </label>
+              </div>
+              <div class="appt-service-option" data-service="护理">
+                <input type="radio" name="service" value="护理" id="svc_care">
+                <label for="svc_care" class="appt-service-card">
+                  <div class="appt-service-icon">
+                    <i class="fas fa-spa"></i>
+                  </div>
+                  <span class="appt-service-name">护理</span>
+                </label>
+              </div>
+            </div>
+            <div class="appt-service-custom-wrap" style="margin-top: 14px;">
+              <label class="appt-form-label" style="font-size: 0.85rem; margin-bottom: 8px;">或自定义服务</label>
+              <input type="text" class="form-control" id="custom_service" name="service_custom" placeholder="输入自定义服务名称..." style="border-radius: 14px; border: 1.5px solid rgba(201, 160, 103, 0.35); padding: 10px 16px;">
+            </div>
+          </div>
+
+          <div class="appt-form-section">
+            <div class="appt-form-section-title">
+              <i class="fas fa-calendar"></i> 预约时间
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;">
+              <div>
+                <label class="appt-form-label" for="date">预约日期</label>
+                <input type="date" class="form-control" id="date" name="date" required style="border-radius: 14px; border: 1.5px solid rgba(201, 160, 103, 0.35); padding: 12px 16px;">
+              </div>
+              <div>
+                <label class="appt-form-label" for="time">预约时间</label>
+                <input type="time" class="form-control" id="time" name="time" required style="border-radius: 14px; border: 1.5px solid rgba(201, 160, 103, 0.35); padding: 12px 16px;">
+              </div>
+            </div>
+            <div class="appt-time-shortcuts" style="margin-top: 14px;">
+              <label class="appt-form-label" style="font-size: 0.85rem; margin-bottom: 8px;">快捷时段</label>
+              <div class="appt-quick-times">
+                <button type="button" class="appt-quick-time-btn" data-time="09:00">09:00</button>
+                <button type="button" class="appt-quick-time-btn" data-time="10:00">10:00</button>
+                <button type="button" class="appt-quick-time-btn" data-time="11:00">11:00</button>
+                <button type="button" class="appt-quick-time-btn" data-time="14:00">14:00</button>
+                <button type="button" class="appt-quick-time-btn" data-time="15:00">15:00</button>
+                <button type="button" class="appt-quick-time-btn" data-time="16:00">16:00</button>
+                <button type="button" class="appt-quick-time-btn" data-time="17:00">17:00</button>
+                <button type="button" class="appt-quick-time-btn" data-time="18:00">18:00</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="appt-form-actions">
+            <button type="submit" class="btn btn-primary appt-submit-btn">
+              <i class="fas fa-check me-1"></i> 确认预约
+            </button>
+            <a href="/appointments" class="btn btn-secondary appt-cancel-btn">取消</a>
+          </div>
+        </form>
+      </div>
+
+      <div class="appt-preview-card">
+        <div class="appt-preview-title">
+          <i class="fas fa-eye"></i> 预约预览
+        </div>
+        <div class="appt-preview-content" id="appt_preview">
+          <div class="appt-preview-empty">
+            <i class="fas fa-calendar-plus"></i>
+            <p>填写左侧表单后<br>预约信息将在此处预览</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container text-center">
+      <p>&copy; 2026 理发会员管理系统</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var memberSearchInput = document.getElementById('member_search');
+      var memberResults = document.getElementById('member_results');
+      var memberIdInput = document.getElementById('member_id');
+      var selectedMemberDiv = document.getElementById('selected_member');
+      var customServiceInput = document.getElementById('custom_service');
+      var dateInput = document.getElementById('date');
+      var timeInput = document.getElementById('time');
+      var previewDiv = document.getElementById('appt_preview');
+      var form = document.getElementById('apptForm');
+
+      var allMembers = [
+        <% if (members && members.length > 0) { %>
+          <% members.forEach(function(member, i) { %>
+            { id: <%= member.id %>, name: '<%= member.name %>', phone: '<%= member.phone || "" %>' }<%= i < members.length - 1 ? ',' : '' %>
+          <% }); %>
+        <% } %>
+      ];
+
+      var selectedMember = null;
+      var selectedService = '';
+
+      var today = new Date().toISOString().split('T')[0];
+      dateInput.setAttribute('min', today);
+
+      memberSearchInput.addEventListener('input', function() {
+        var keyword = this.value.trim().toLowerCase();
+        if (!keyword) {
+          memberResults.style.display = 'none';
+          return;
+        }
+        var filtered = allMembers.filter(function(m) {
+          return m.name.toLowerCase().indexOf(keyword) !== -1 ||
+                 m.phone.toLowerCase().indexOf(keyword) !== -1;
+        });
+        if (filtered.length === 0) {
+          memberResults.innerHTML = '<div class="appt-form-search-item" style="color: var(--text-light); cursor: default;">未找到匹配会员</div>';
+        } else {
+          memberResults.innerHTML = filtered.map(function(m) {
+            return '<div class="appt-form-search-item" data-id="' + m.id + '" data-name="' + m.name + '" data-phone="' + m.phone + '">' +
+              '<div class="appt-form-search-avatar">' + m.name.charAt(0) + '</div>' +
+              '<div class="appt-form-search-info">' +
+              '<span class="appt-form-search-name">' + m.name + '</span>' +
+              '<span class="appt-form-search-phone">' + m.phone + '</span>' +
+              '</div></div>';
+          }).join('');
+        }
+        memberResults.style.display = 'block';
+      });
+
+      memberResults.addEventListener('click', function(e) {
+        var item = e.target.closest('.appt-form-search-item');
+        if (!item || !item.dataset.id) return;
+        selectedMember = { id: item.dataset.id, name: item.dataset.name, phone: item.dataset.phone };
+        memberIdInput.value = selectedMember.id;
+        memberSearchInput.value = '';
+        memberResults.style.display = 'none';
+        selectedMemberDiv.style.display = 'block';
+        selectedMemberDiv.innerHTML =
+          '<div class="appt-form-selected-member">' +
+          '<div class="appt-form-selected-avatar">' + selectedMember.name.charAt(0) + '</div>' +
+          '<div class="appt-form-selected-info">' +
+          '<span class="appt-form-selected-name">' + selectedMember.name + '</span>' +
+          '<span class="appt-form-selected-phone"><i class="fas fa-phone me-1"></i>' + selectedMember.phone + '</span>' +
+          '</div>' +
+          '<button type="button" class="appt-form-selected-remove" id="remove_member"><i class="fas fa-times"></i></button>' +
+          '</div>';
+        document.getElementById('remove_member').addEventListener('click', function() {
+          selectedMember = null;
+          memberIdInput.value = '';
+          selectedMemberDiv.style.display = 'none';
+          updatePreview();
+        });
+        updatePreview();
+      });
+
+      document.addEventListener('click', function(e) {
+        if (!memberSearchInput.contains(e.target) && !memberResults.contains(e.target)) {
+          memberResults.style.display = 'none';
+        }
+      });
+
+      var serviceOptions = document.querySelectorAll('.appt-service-option input[type="radio"]');
+      serviceOptions.forEach(function(radio) {
+        radio.addEventListener('change', function() {
+          selectedService = this.value;
+          customServiceInput.value = '';
+          updateServiceCards();
+          updatePreview();
+        });
+      });
+
+      customServiceInput.addEventListener('input', function() {
+        if (this.value.trim()) {
+          selectedService = this.value.trim();
+          serviceOptions.forEach(function(r) { r.checked = false; });
+          updateServiceCards();
+          updatePreview();
+        } else {
+          selectedService = '';
+          updatePreview();
+        }
+      });
+
+      function updateServiceCards() {
+        document.querySelectorAll('.appt-service-card').forEach(function(card) {
+          card.classList.remove('active');
+          var badge = card.querySelector('.appt-service-check');
+          if (badge) badge.remove();
+        });
+        serviceOptions.forEach(function(radio) {
+          if (radio.checked) {
+            var card = radio.parentElement.querySelector('.appt-service-card');
+            card.classList.add('active');
+            var checkBadge = document.createElement('span');
+            checkBadge.className = 'appt-service-check';
+            checkBadge.innerHTML = '<i class="fas fa-check"></i>';
+            card.appendChild(checkBadge);
+          }
+        });
+      }
+
+      var quickTimeBtns = document.querySelectorAll('.appt-quick-time-btn');
+      quickTimeBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          timeInput.value = this.dataset.time;
+          quickTimeBtns.forEach(function(b) { b.classList.remove('active'); });
+          this.classList.add('active');
+          updatePreview();
+        });
+      });
+
+      dateInput.addEventListener('change', updatePreview);
+      timeInput.addEventListener('change', function() {
+        quickTimeBtns.forEach(function(b) { b.classList.remove('active'); });
+        updatePreview();
+      });
+
+      function updatePreview() {
+        var member = selectedMember;
+        var service = selectedService || customServiceInput.value.trim();
+        var date = dateInput.value;
+        var time = timeInput.value;
+
+        if (!member && !service && !date && !time) {
+          previewDiv.innerHTML =
+            '<div class="appt-preview-empty">' +
+            '<i class="fas fa-calendar-plus"></i>' +
+            '<p>填写左侧表单后<br>预约信息将在此处预览</p>' +
+            '</div>';
+          return;
+        }
+
+        var html = '<div class="appt-preview-detail">';
+
+        html += '<div class="appt-preview-item">';
+        html += '<div class="appt-preview-item-icon"><i class="fas fa-user"></i></div>';
+        html += '<div class="appt-preview-item-content">';
+        html += '<span class="appt-preview-item-label">会员</span>';
+        html += '<span class="appt-preview-item-value">' + (member ? member.name : '<em>未选择</em>') + '</span>';
+        html += '</div></div>';
+
+        html += '<div class="appt-preview-item">';
+        html += '<div class="appt-preview-item-icon"><i class="fas fa-cut"></i></div>';
+        html += '<div class="appt-preview-item-content">';
+        html += '<span class="appt-preview-item-label">服务</span>';
+        html += '<span class="appt-preview-item-value">' + (service || '<em>未选择</em>') + '</span>';
+        html += '</div></div>';
+
+        html += '<div class="appt-preview-item">';
+        html += '<div class="appt-preview-item-icon"><i class="fas fa-calendar"></i></div>';
+        html += '<div class="appt-preview-item-content">';
+        html += '<span class="appt-preview-item-label">日期</span>';
+        html += '<span class="appt-preview-item-value">' + (date || '<em>未选择</em>') + '</span>';
+        html += '</div></div>';
+
+        html += '<div class="appt-preview-item">';
+        html += '<div class="appt-preview-item-icon"><i class="fas fa-clock"></i></div>';
+        html += '<div class="appt-preview-item-content">';
+        html += '<span class="appt-preview-item-label">时间</span>';
+        html += '<span class="appt-preview-item-value">' + (time || '<em>未选择</em>') + '</span>';
+        html += '</div></div>';
+
+        html += '</div>';
+
+        var ready = member && service && date && time;
+        if (ready) {
+          html += '<div class="appt-preview-ready">';
+          html += '<i class="fas fa-check-circle"></i> 预约信息已完整，可以提交';
+          html += '</div>';
+        } else {
+          html += '<div class="appt-preview-incomplete">';
+          html += '<i class="fas fa-exclamation-circle"></i> 请完善所有预约信息';
+          html += '</div>';
+        }
+
+        previewDiv.innerHTML = html;
+      }
+
+      form.addEventListener('submit', function(e) {
+        var service = selectedService || customServiceInput.value.trim();
+        if (!memberIdInput.value) {
+          e.preventDefault();
+          alert('请选择会员');
+          return;
+        }
+        if (!service) {
+          e.preventDefault();
+          alert('请选择或输入服务项目');
+          return;
+        }
+        if (customServiceInput.value.trim()) {
+          var hiddenInput = document.createElement('input');
+          hiddenInput.type = 'hidden';
+          hiddenInput.name = 'service';
+          hiddenInput.value = customServiceInput.value.trim();
+          form.appendChild(hiddenInput);
+          var radios = form.querySelectorAll('input[name="service"][type="radio"]');
+          radios.forEach(function(r) { r.removeAttribute('name'); });
+        }
+      });
+
+      updatePreview();
+    });
+  </script>
+  <script src="/confirm.js"></script>
+</body>
+</html>

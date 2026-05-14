@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>修改余额 - 理发会员管理系统</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="/">理发会员管理系统</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/"><i class="fas fa-home me-1"></i> 首页</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/members"><i class="fas fa-users me-1"></i> 会员管理</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/appointments"><i class="fas fa-calendar-alt me-1"></i> 预约管理</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/transactions"><i class="fas fa-receipt me-1"></i> 消费记录</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/orders"><i class="fas fa-shopping-cart me-1"></i> 订单管理</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/balance"><i class="fas fa-wallet me-1"></i> 余额管理</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/stats"><i class="fas fa-chart-bar me-1"></i> 数据统计</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link logout-link" href="/logout" onclick="return confirmAction(this, '确定要退出登录吗？', 'logout');"><i class="fas fa-sign-out-alt me-1"></i> 退出登录</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container balance-container">
+    <div class="balance-header">
+      <div>
+        <h1 class="balance-page-title">修改会员余额</h1>
+        <p class="balance-subtitle">为会员进行充值或扣费操作</p>
+      </div>
+      <div class="balance-header-actions">
+        <a href="/balance" class="btn btn-secondary">
+          <i class="fas fa-arrow-left me-1"></i> 返回余额管理
+        </a>
+      </div>
+    </div>
+
+    <div class="eb-layout">
+      <div class="eb-member-card">
+        <div class="eb-member-card-bg"></div>
+        <div class="eb-member-avatar">
+          <%= member.name.charAt(0) %>
+        </div>
+        <h4 class="eb-member-name"><%= member.name %></h4>
+        <p class="eb-member-phone"><i class="fas fa-phone-alt me-1"></i><%= member.phone %></p>
+        <div class="eb-member-balance-section">
+          <span class="eb-balance-label">当前余额</span>
+          <span class="eb-balance-value">¥<%= (member.balance || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
+        </div>
+      </div>
+
+      <div class="eb-form-card">
+        <form action="/balance/edit/<%= member.id %>" method="post" id="balanceForm">
+          <div class="eb-form-section">
+            <label class="eb-form-label">操作类型</label>
+            <div class="eb-type-toggle">
+              <label class="eb-type-option eb-type-add active" id="typeAddLabel">
+                <input type="radio" name="type" id="add" value="add" checked>
+                <div class="eb-type-card">
+                  <div class="eb-type-icon">
+                    <i class="fas fa-plus-circle"></i>
+                  </div>
+                  <span class="eb-type-name">充值</span>
+                  <span class="eb-type-desc">增加会员余额</span>
+                </div>
+              </label>
+              <label class="eb-type-option eb-type-deduct" id="typeDeductLabel">
+                <input type="radio" name="type" id="deduct" value="deduct">
+                <div class="eb-type-card">
+                  <div class="eb-type-icon">
+                    <i class="fas fa-minus-circle"></i>
+                  </div>
+                  <span class="eb-type-name">扣费</span>
+                  <span class="eb-type-desc">减少会员余额</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="eb-form-section">
+            <label class="eb-form-label" for="amount">操作金额</label>
+            <div class="eb-amount-input-wrap">
+              <span class="eb-amount-prefix">¥</span>
+              <input type="number" class="form-control eb-amount-input" id="amount" name="amount" step="0.01" min="0.01" required placeholder="请输入金额">
+            </div>
+          </div>
+
+          <div class="eb-form-section">
+            <label class="eb-form-label">快捷金额</label>
+            <div class="eb-quick-amounts">
+              <button type="button" class="eb-quick-btn" data-amount="50">50</button>
+              <button type="button" class="eb-quick-btn" data-amount="100">100</button>
+              <button type="button" class="eb-quick-btn" data-amount="200">200</button>
+              <button type="button" class="eb-quick-btn" data-amount="300">300</button>
+              <button type="button" class="eb-quick-btn" data-amount="500">500</button>
+              <button type="button" class="eb-quick-btn" data-amount="1000">1000</button>
+            </div>
+          </div>
+
+          <div class="eb-preview" id="balancePreview" style="display: none;">
+            <div class="eb-preview-label">操作后余额</div>
+            <div class="eb-preview-value" id="previewValue">¥0.00</div>
+          </div>
+
+          <div class="eb-form-actions">
+            <button type="submit" class="btn btn-primary eb-submit-btn" id="submitBtn">
+              <i class="fas fa-check me-1"></i> 确认充值
+            </button>
+            <a href="/balance" class="btn btn-secondary eb-cancel-btn">
+              <i class="fas fa-times me-1"></i> 取消
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container text-center">
+      <p>&copy; 2026 理发会员管理系统</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function() {
+      var currentBalance = <%= member.balance || 0 %>;
+      var amountInput = document.getElementById('amount');
+      var previewEl = document.getElementById('balancePreview');
+      var previewValue = document.getElementById('previewValue');
+      var submitBtn = document.getElementById('submitBtn');
+      var addLabel = document.getElementById('typeAddLabel');
+      var deductLabel = document.getElementById('typeDeductLabel');
+      var addRadio = document.getElementById('add');
+      var deductRadio = document.getElementById('deduct');
+
+      function getType() {
+        return addRadio.checked ? 'add' : 'deduct';
+      }
+
+      function updatePreview() {
+        var amount = parseFloat(amountInput.value);
+        if (isNaN(amount) || amount <= 0) {
+          previewEl.style.display = 'none';
+          return;
+        }
+        var type = getType();
+        var newBalance = type === 'add' ? currentBalance + amount : currentBalance - amount;
+        previewEl.style.display = '';
+        previewValue.textContent = '¥' + newBalance.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        previewValue.className = 'eb-preview-value ' + (newBalance >= 0 ? 'eb-preview-positive' : 'eb-preview-negative');
+      }
+
+      function updateTypeUI() {
+        var type = getType();
+        if (type === 'add') {
+          addLabel.classList.add('active');
+          deductLabel.classList.remove('active');
+          submitBtn.innerHTML = '<i class="fas fa-check me-1"></i> 确认充值';
+          submitBtn.className = 'btn btn-primary eb-submit-btn';
+        } else {
+          deductLabel.classList.add('active');
+          addLabel.classList.remove('active');
+          submitBtn.innerHTML = '<i class="fas fa-check me-1"></i> 确认扣费';
+          submitBtn.className = 'btn btn-danger eb-submit-btn';
+        }
+        updatePreview();
+      }
+
+      addRadio.addEventListener('change', updateTypeUI);
+      deductRadio.addEventListener('change', updateTypeUI);
+      amountInput.addEventListener('input', updatePreview);
+
+      document.querySelectorAll('.eb-quick-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          amountInput.value = this.getAttribute('data-amount');
+          updatePreview();
+          document.querySelectorAll('.eb-quick-btn').forEach(function(b) { b.classList.remove('active'); });
+          this.classList.add('active');
+        });
+      });
+
+      document.getElementById('balanceForm').addEventListener('submit', function(e) {
+        var amount = parseFloat(amountInput.value);
+        var type = getType();
+        if (type === 'deduct' && amount > currentBalance) {
+          e.preventDefault();
+          customConfirm(null, '扣费金额超过当前余额，操作后余额将为负数，是否继续？', 'warning').then(function(confirmed) {
+            if (confirmed) {
+              document.getElementById('balanceForm').submit();
+            }
+          });
+        }
+      });
+    })();
+  </script>
+  <script src="/confirm.js"></script>
+</body>
+</html>

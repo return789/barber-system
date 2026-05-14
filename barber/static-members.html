@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>会员管理 - 理发会员管理系统</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #1e3a5f;
+      --secondary-color: #2c5aa0;
+      --accent-color: #34495e;
+      --success-color: #27ae60;
+      --warning-color: #e67e22;
+      --info-color: #3498db;
+      --light-color: #ecf0f1;
+      --dark-color: #2c3e50;
+      --text-color: #2c3e50;
+      --text-light: #7f8c8d;
+    }
+
+    body {
+      font-family: 'Microsoft YaHei', Arial, sans-serif;
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+
+    .navbar {
+      background-color: var(--primary-color);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+
+    .navbar-brand {
+      font-weight: 600;
+      font-size: 1.3rem;
+      color: white !important;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-link {
+      color: rgba(255,255,255,0.85) !important;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      padding: 6px 16px !important;
+      margin: 0 3px;
+      border-radius: 4px;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: white !important;
+      background-color: rgba(255,255,255,0.1);
+      border-radius: 4px;
+    }
+
+    .page-title {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--dark-color);
+      margin-bottom: 10px;
+      position: relative;
+      padding-bottom: 12px;
+    }
+
+    .page-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 80px;
+      height: 3px;
+      background-color: var(--primary-color);
+      border-radius: 2px;
+    }
+
+    .card {
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border: 1px solid #d5dbdb;
+      overflow: hidden;
+    }
+
+    .card-body {
+      padding: 24px;
+    }
+
+    .table {
+      margin-bottom: 0;
+    }
+
+    .table-hover tbody tr:hover {
+      background-color: #f8f9fa;
+    }
+
+    .table thead {
+      background-color: #ecf0f1;
+    }
+
+    .table th {
+      font-weight: 600;
+      color: var(--dark-color);
+      border-bottom: 2px solid var(--primary-color);
+    }
+
+    .btn {
+      border-radius: 6px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      border: none;
+      box-shadow: 0 2px 6px rgba(30, 58, 95, 0.15);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--secondary-color);
+      box-shadow: 0 3px 8px rgba(30, 58, 95, 0.2);
+    }
+
+    .btn-success {
+      background-color: var(--success-color);
+      border: none;
+      box-shadow: 0 2px 6px rgba(39, 174, 96, 0.15);
+    }
+
+    .btn-success:hover {
+      background-color: #229954;
+      box-shadow: 0 3px 8px rgba(39, 174, 96, 0.2);
+    }
+
+    .btn-danger {
+      background-color: #e74c3c;
+      border: none;
+      box-shadow: 0 2px 6px rgba(231, 76, 60, 0.15);
+    }
+
+    .btn-danger:hover {
+      background-color: #c0392b;
+      box-shadow: 0 3px 8px rgba(231, 76, 60, 0.2);
+    }
+
+    .btn-secondary {
+      background-color: #95a5a6;
+      border: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .btn-secondary:hover {
+      background-color: #7f8c8d;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+    }
+
+    .badge {
+      font-weight: 600;
+      padding: 0.5em 0.75em;
+      border-radius: 12px;
+    }
+
+    .badge-primary {
+      background-color: var(--primary-color);
+    }
+
+    .badge-success {
+      background-color: var(--success-color);
+    }
+
+    .footer {
+      background: var(--dark-color);
+      color: white;
+      padding: 40px 0;
+      margin-top: 60px;
+    }
+
+    .footer p {
+      margin: 0;
+      opacity: 0.8;
+    }
+
+    .pagination {
+      justify-content: center;
+    }
+
+    .pagination .page-item.active .page-link {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .pagination .page-link {
+      color: var(--primary-color);
+      transition: all 0.2s ease;
+    }
+
+    .pagination .page-link:hover {
+      color: var(--secondary-color);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="static-index.html">理发会员管理系统</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="static-index.html">
+              <i class="fas fa-home me-1"></i> 首页
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="static-members.html">
+              <i class="fas fa-users me-1"></i> 会员管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="static-appointments.html">
+              <i class="fas fa-calendar-alt me-1"></i> 预约管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="static-transactions.html">
+              <i class="fas fa-receipt me-1"></i> 消费记录
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="static-orders.html">
+              <i class="fas fa-shopping-cart me-1"></i> 订单管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="static-balance.html">
+              <i class="fas fa-wallet me-1"></i> 余额管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="static-stats.html">
+              <i class="fas fa-chart-bar me-1"></i> 数据统计
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link logout-link" href="static-login.html" onclick="return confirm('确定要退出登录吗？');">
+              <i class="fas fa-sign-out-alt me-1"></i> 退出登录
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1 class="page-title">会员管理</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <p class="text-muted">管理会员信息，包括添加、编辑和删除会员</p>
+      <a href="static-add-member.html" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i> 添加会员
+      </a>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>会员编号</th>
+                <th>姓名</th>
+                <th>电话</th>
+                <th>生日</th>
+                <th>会员等级</th>
+                <th>积分</th>
+                <th>余额</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>12</td>
+                <td>张先生</td>
+                <td>13812345678</td>
+                <td>1990-01-01</td>
+                <td>
+                  <span class="badge badge-primary">普通</span>
+                </td>
+                <td>100</td>
+                <td>¥200.00</td>
+                <td>
+                  <div class="d-flex gap-2 justify-content-center">
+                    <a href="static-edit-member.html" class="btn btn-primary btn-sm">
+                      <i class="fas fa-edit me-1"></i> 编辑
+                    </a>
+                    <a href="static-edit-balance.html" class="btn btn-success btn-sm">
+                      <i class="fas fa-wallet me-1"></i> 修改余额
+                    </a>
+                    <a href="#" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个会员吗？');">
+                      <i class="fas fa-trash me-1"></i> 删除
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>11</td>
+                <td>李女士</td>
+                <td>13987654321</td>
+                <td>1992-03-15</td>
+                <td>
+                  <span class="badge badge-primary">高级</span>
+                </td>
+                <td>250</td>
+                <td>¥500.00</td>
+                <td>
+                  <div class="d-flex gap-2 justify-content-center">
+                    <a href="static-edit-member.html" class="btn btn-primary btn-sm">
+                      <i class="fas fa-edit me-1"></i> 编辑
+                    </a>
+                    <a href="static-edit-balance.html" class="btn btn-success btn-sm">
+                      <i class="fas fa-wallet me-1"></i> 修改余额
+                    </a>
+                    <a href="#" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个会员吗？');">
+                      <i class="fas fa-trash me-1"></i> 删除
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>10</td>
+                <td>王先生</td>
+                <td>13765432198</td>
+                <td>1988-06-20</td>
+                <td>
+                  <span class="badge badge-primary">普通</span>
+                </td>
+                <td>80</td>
+                <td>¥150.00</td>
+                <td>
+                  <div class="d-flex gap-2 justify-content-center">
+                    <a href="static-edit-member.html" class="btn btn-primary btn-sm">
+                      <i class="fas fa-edit me-1"></i> 编辑
+                    </a>
+                    <a href="static-edit-balance.html" class="btn btn-success btn-sm">
+                      <i class="fas fa-wallet me-1"></i> 修改余额
+                    </a>
+                    <a href="#" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个会员吗？');">
+                      <i class="fas fa-trash me-1"></i> 删除
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>9</td>
+                <td>赵女士</td>
+                <td>13698765432</td>
+                <td>1995-09-10</td>
+                <td>
+                  <span class="badge badge-primary">高级</span>
+                </td>
+                <td>320</td>
+                <td>¥800.00</td>
+                <td>
+                  <div class="d-flex gap-2 justify-content-center">
+                    <a href="static-edit-member.html" class="btn btn-primary btn-sm">
+                      <i class="fas fa-edit me-1"></i> 编辑
+                    </a>
+                    <a href="static-edit-balance.html" class="btn btn-success btn-sm">
+                      <i class="fas fa-wallet me-1"></i> 修改余额
+                    </a>
+                    <a href="#" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个会员吗？');">
+                      <i class="fas fa-trash me-1"></i> 删除
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td>陈先生</td>
+                <td>13567890123</td>
+                <td>1991-12-05</td>
+                <td>
+                  <span class="badge badge-primary">普通</span>
+                </td>
+                <td>60</td>
+                <td>¥100.00</td>
+                <td>
+                  <div class="d-flex gap-2 justify-content-center">
+                    <a href="static-edit-member.html" class="btn btn-primary btn-sm">
+                      <i class="fas fa-edit me-1"></i> 编辑
+                    </a>
+                    <a href="static-edit-balance.html" class="btn btn-success btn-sm">
+                      <i class="fas fa-wallet me-1"></i> 修改余额
+                    </a>
+                    <a href="#" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个会员吗？');">
+                      <i class="fas fa-trash me-1"></i> 删除
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="mt-4">
+          <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+              <li class="page-item disabled">
+                <a class="page-link" href="#" aria-label="First">
+                  <span aria-hidden="true">&laquo;&laquo;</span>
+                </a>
+              </li>
+              <li class="page-item disabled">
+                <a class="page-link" href="#">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+              <li class="page-item active">
+                <a class="page-link" href="#">1</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">2</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">3</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#" aria-label="Last">
+                  <span aria-hidden="true">&raquo;&raquo;</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+          <div class="text-center mt-2">
+            <p class="text-muted">
+              共 12 条记录，第 1 / 3 页
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container text-center">
+      <p>&copy; 2026 理发会员管理系统</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

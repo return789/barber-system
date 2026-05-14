@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数据统计 - 理发会员管理系统</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="/">理发会员管理系统</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/"><i class="fas fa-home me-1"></i> 首页</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/members"><i class="fas fa-users me-1"></i> 会员管理</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/appointments"><i class="fas fa-calendar-alt me-1"></i> 预约管理</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/transactions"><i class="fas fa-receipt me-1"></i> 消费记录</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/orders"><i class="fas fa-shopping-cart me-1"></i> 订单管理</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/balance"><i class="fas fa-wallet me-1"></i> 余额管理</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/stats"><i class="fas fa-chart-bar me-1"></i> 数据统计</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link logout-link" href="/logout" onclick="return confirmAction(this, '确定要退出登录吗？', 'logout');"><i class="fas fa-sign-out-alt me-1"></i> 退出登录</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container stats-container">
+    <div class="stats-header">
+      <div class="stats-header-left">
+        <h1 class="stats-page-title">数据统计</h1>
+        <p class="stats-subtitle">实时业务数据概览与趋势分析</p>
+      </div>
+      <div class="stats-header-right">
+        <span class="stats-date-badge">
+          <i class="fas fa-clock me-1"></i>
+          <span id="currentDate"></span>
+        </span>
+      </div>
+    </div>
+
+    <div class="stats-kpi-row">
+      <div class="stats-kpi-card stats-kpi-gold">
+        <div class="stats-kpi-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stats-kpi-content">
+          <span class="stats-kpi-label">会员总数</span>
+          <span class="stats-kpi-value"><%= stats.memberCount %></span>
+        </div>
+        <div class="stats-kpi-decoration"></div>
+      </div>
+
+      <div class="stats-kpi-card stats-kpi-rose">
+        <div class="stats-kpi-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="stats-kpi-content">
+          <span class="stats-kpi-label">今日预约</span>
+          <span class="stats-kpi-value"><%= stats.todayAppointments %></span>
+        </div>
+        <div class="stats-kpi-decoration"></div>
+      </div>
+
+      <div class="stats-kpi-card stats-kpi-teal">
+        <div class="stats-kpi-icon">
+          <i class="fas fa-yen-sign"></i>
+        </div>
+        <div class="stats-kpi-content">
+          <span class="stats-kpi-label">本月销售额</span>
+          <span class="stats-kpi-value">¥<%= stats.monthlySales.toFixed(0) %></span>
+        </div>
+        <div class="stats-kpi-decoration"></div>
+      </div>
+
+      <div class="stats-kpi-card stats-kpi-emerald">
+        <div class="stats-kpi-icon">
+          <i class="fas fa-wallet"></i>
+        </div>
+        <div class="stats-kpi-content">
+          <span class="stats-kpi-label">会员总余额</span>
+          <span class="stats-kpi-value">¥<%= stats.totalBalance.toFixed(0) %></span>
+        </div>
+        <div class="stats-kpi-decoration"></div>
+      </div>
+    </div>
+
+    <div class="stats-secondary-row">
+      <div class="stats-mini-card">
+        <div class="stats-mini-icon"><i class="fas fa-receipt"></i></div>
+        <div class="stats-mini-content">
+          <span class="stats-mini-label">总消费笔数</span>
+          <span class="stats-mini-value"><%= stats.totalTransactions %></span>
+        </div>
+      </div>
+      <div class="stats-mini-card">
+        <div class="stats-mini-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="stats-mini-content">
+          <span class="stats-mini-label">平均消费额</span>
+          <span class="stats-mini-value">¥<%= stats.avgTransaction.toFixed(0) %></span>
+        </div>
+      </div>
+      <div class="stats-mini-card">
+        <div class="stats-mini-icon"><i class="fas fa-hourglass-half"></i></div>
+        <div class="stats-mini-content">
+          <span class="stats-mini-label">待确认预约</span>
+          <span class="stats-mini-value"><%= stats.pendingAppointments %></span>
+        </div>
+      </div>
+      <div class="stats-mini-card">
+        <div class="stats-mini-icon"><i class="fas fa-star"></i></div>
+        <div class="stats-mini-content">
+          <span class="stats-mini-label">总积分</span>
+          <span class="stats-mini-value"><%= stats.totalPoints.toFixed(0) %></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-charts-row">
+      <div class="stats-chart-card">
+        <div class="stats-chart-header">
+          <h3 class="stats-chart-title">
+            <i class="fas fa-chart-bar me-2"></i>会员等级分布
+          </h3>
+        </div>
+        <div class="stats-chart-body">
+          <% if (stats.membershipDistribution && stats.membershipDistribution.length > 0) { %>
+            <div class="stats-bar-chart">
+              <% 
+                const maxCount = Math.max(...stats.membershipDistribution.map(item => item.count));
+                const levelColors = {
+                  '普通': '#C9A067',
+                  '银卡': '#A8B4C0',
+                  '金卡': '#D4A843',
+                  '白金': '#7B9FB8',
+                  '钻石': '#B86A6A'
+                };
+              %>
+              <% stats.membershipDistribution.forEach((item, index) => { %>
+                <div class="stats-bar-item" style="animation-delay: <%= index * 0.12 %>s">
+                  <div class="stats-bar-label">
+                    <span class="stats-bar-name"><%= item.membership_level %></span>
+                    <span class="stats-bar-count"><%= item.count %> 人</span>
+                  </div>
+                  <div class="stats-bar-track">
+                    <div class="stats-bar-fill" style="width: <%= (item.count / maxCount * 100) %>%; background-color: <%= levelColors[item.membership_level] || '#C9A067' %>;"></div>
+                  </div>
+                </div>
+              <% }); %>
+            </div>
+          <% } else { %>
+            <div class="stats-empty-state">
+              <i class="fas fa-chart-pie"></i>
+              <p>暂无会员等级数据</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="stats-chart-card">
+        <div class="stats-chart-header">
+          <h3 class="stats-chart-title">
+            <i class="fas fa-chart-area me-2"></i>近7日销售趋势
+          </h3>
+        </div>
+        <div class="stats-chart-body">
+          <% if (stats.weeklySales && stats.weeklySales.length > 0) { %>
+            <div class="stats-trend-chart">
+              <%
+                const salesValues = stats.weeklySales.map(s => s.total || 0);
+                const maxSale = Math.max(...salesValues, 1);
+                const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+              %>
+              <div class="stats-trend-area">
+                <svg viewBox="0 0 400 180" class="stats-trend-svg" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="rgba(201,160,103,0.35)"/>
+                      <stop offset="100%" stop-color="rgba(201,160,103,0.02)"/>
+                    </linearGradient>
+                  </defs>
+                  <% 
+                    const points = stats.weeklySales.map((s, i) => {
+                      const x = (i / Math.max(stats.weeklySales.length - 1, 1)) * 380 + 10;
+                      const y = 170 - ((s.total || 0) / maxSale) * 150;
+                      return { x, y, total: s.total || 0, date: s.date };
+                    });
+                    const linePath = points.map((p, i) => (i === 0 ? 'M' : 'L') + p.x + ',' + p.y).join(' ');
+                    const areaPath = linePath + ' L' + points[points.length - 1].x + ',170 L' + points[0].x + ',170 Z';
+                  %>
+                  <path d="<%= areaPath %>" fill="url(#trendGradient)"/>
+                  <path d="<%= linePath %>" fill="none" stroke="#C9A067" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <% points.forEach(p => { %>
+                    <circle cx="<%= p.x %>" cy="<%= p.y %>" r="4" fill="#C9A067" stroke="white" stroke-width="2"/>
+                  <% }); %>
+                </svg>
+              </div>
+              <div class="stats-trend-labels">
+                <% stats.weeklySales.forEach(s => { 
+                  const d = new Date(s.date);
+                  const label = (d.getMonth() + 1) + '/' + d.getDate();
+                %>
+                  <div class="stats-trend-label-item">
+                    <span class="stats-trend-label-amount">¥<%= (s.total || 0).toFixed(0) %></span>
+                    <span class="stats-trend-label-date"><%= label %></span>
+                  </div>
+                <% }); %>
+              </div>
+            </div>
+          <% } else { %>
+            <div class="stats-empty-state">
+              <i class="fas fa-chart-area"></i>
+              <p>近7日暂无销售数据</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-detail-row">
+      <div class="stats-detail-card">
+        <div class="stats-detail-header">
+          <h3 class="stats-detail-title">
+            <i class="fas fa-crown me-2"></i>会员等级明细
+          </h3>
+        </div>
+        <div class="stats-detail-body">
+          <% if (stats.membershipDistribution && stats.membershipDistribution.length > 0) { %>
+            <div class="stats-level-grid">
+              <% 
+                const levelIcons = {
+                  '普通': 'fa-user',
+                  '银卡': 'fa-medal',
+                  '金卡': 'fa-crown',
+                  '白金': 'fa-gem',
+                  '钻石': 'fa-diamond'
+                };
+                const levelBgs = {
+                  '普通': 'stats-level-bronze',
+                  '银卡': 'stats-level-silver',
+                  '金卡': 'stats-level-gold',
+                  '白金': 'stats-level-platinum',
+                  '钻石': 'stats-level-diamond'
+                };
+              %>
+              <% stats.membershipDistribution.forEach(item => { %>
+                <div class="stats-level-item <%= levelBgs[item.membership_level] || 'stats-level-bronze' %>">
+                  <div class="stats-level-icon">
+                    <i class="fas <%= levelIcons[item.membership_level] || 'fa-user' %>"></i>
+                  </div>
+                  <div class="stats-level-info">
+                    <span class="stats-level-name"><%= item.membership_level %></span>
+                    <span class="stats-level-count"><%= item.count %> 位会员</span>
+                  </div>
+                  <div class="stats-level-pct">
+                    <%= (item.count / stats.memberCount * 100).toFixed(1) %>%
+                  </div>
+                </div>
+              <% }); %>
+            </div>
+          <% } else { %>
+            <div class="stats-empty-state">
+              <i class="fas fa-users"></i>
+              <p>暂无会员等级数据</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="stats-detail-card">
+        <div class="stats-detail-header">
+          <h3 class="stats-detail-title">
+            <i class="fas fa-bolt me-2"></i>快速概览
+          </h3>
+        </div>
+        <div class="stats-detail-body">
+          <div class="stats-quick-grid">
+            <div class="stats-quick-item">
+              <div class="stats-quick-ring stats-ring-gold">
+                <svg viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(201,160,103,0.15)" stroke-width="6"/>
+                  <circle cx="40" cy="40" r="34" fill="none" stroke="#C9A067" stroke-width="6" 
+                    stroke-dasharray="<%= (stats.todayAppointments / Math.max(stats.todayAppointments + stats.pendingAppointments, 1) * 214) %> 214"
+                    stroke-linecap="round" transform="rotate(-90 40 40)"/>
+                </svg>
+                <span class="stats-ring-value"><%= stats.todayAppointments %></span>
+              </div>
+              <span class="stats-quick-label">今日预约</span>
+            </div>
+            <div class="stats-quick-item">
+              <div class="stats-quick-ring stats-ring-rose">
+                <svg viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(229,101,120,0.15)" stroke-width="6"/>
+                  <circle cx="40" cy="40" r="34" fill="none" stroke="#e56578" stroke-width="6"
+                    stroke-dasharray="<%= (stats.pendingAppointments / Math.max(stats.todayAppointments + stats.pendingAppointments, 1) * 214) %> 214"
+                    stroke-linecap="round" transform="rotate(-90 40 40)"/>
+                </svg>
+                <span class="stats-ring-value"><%= stats.pendingAppointments %></span>
+              </div>
+              <span class="stats-quick-label">待确认</span>
+            </div>
+            <div class="stats-quick-item">
+              <div class="stats-quick-ring stats-ring-teal">
+                <svg viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(115,209,232,0.15)" stroke-width="6"/>
+                  <circle cx="40" cy="40" r="34" fill="none" stroke="#73d1e8" stroke-width="6"
+                    stroke-dasharray="<%= Math.min(stats.totalTransactions / Math.max(stats.memberCount, 1) * 40, 214) %> 214"
+                    stroke-linecap="round" transform="rotate(-90 40 40)"/>
+                </svg>
+                <span class="stats-ring-value"><%= stats.totalTransactions %></span>
+              </div>
+              <span class="stats-quick-label">总消费笔数</span>
+            </div>
+            <div class="stats-quick-item">
+              <div class="stats-quick-ring stats-ring-emerald">
+                <svg viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(129,206,157,0.15)" stroke-width="6"/>
+                  <circle cx="40" cy="40" r="34" fill="none" stroke="#81ce9d" stroke-width="6"
+                    stroke-dasharray="<%= Math.min(stats.avgTransaction / 500 * 214, 214) %> 214"
+                    stroke-linecap="round" transform="rotate(-90 40 40)"/>
+                </svg>
+                <span class="stats-ring-value">¥<%= stats.avgTransaction.toFixed(0) %></span>
+              </div>
+              <span class="stats-quick-label">平均消费</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container text-center">
+      <p>&copy; 2026 理发会员管理系统</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const now = new Date();
+    const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+    document.getElementById('currentDate').textContent = now.toLocaleDateString('zh-CN', options);
+  </script>
+  <script src="/confirm.js"></script>
+</body>
+</html>

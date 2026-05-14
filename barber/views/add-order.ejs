@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>添加订单 - 理发会员管理系统</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="/">理发会员管理系统</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">
+              <i class="fas fa-home me-1"></i> 首页
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/members">
+              <i class="fas fa-users me-1"></i> 会员管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/appointments">
+              <i class="fas fa-calendar-alt me-1"></i> 预约管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/transactions">
+              <i class="fas fa-receipt me-1"></i> 消费记录
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/orders">
+              <i class="fas fa-shopping-cart me-1"></i> 订单管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/balance">
+              <i class="fas fa-wallet me-1"></i> 余额管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/stats">
+              <i class="fas fa-chart-bar me-1"></i> 数据统计
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link logout-link" href="/logout" onclick="return confirmAction(this, '确定要退出登录吗？', 'logout');">
+              <i class="fas fa-sign-out-alt me-1"></i> 退出登录
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container order-form-container">
+    <div class="order-form-header">
+      <div>
+        <h1 class="order-form-page-title">添加订单</h1>
+        <p class="order-form-subtitle">为会员创建新的服务订单</p>
+      </div>
+      <div>
+        <a href="/orders" class="btn btn-secondary">
+          <i class="fas fa-arrow-left me-1"></i> 返回订单管理
+        </a>
+      </div>
+    </div>
+
+    <form action="/orders/add" method="post" id="orderForm">
+      <div class="order-form-layout">
+        <div class="order-form-card">
+          <div class="order-form-section">
+            <div class="order-form-section-title">
+              <i class="fas fa-user"></i> 会员选择
+            </div>
+            <label class="order-form-label">搜索会员</label>
+            <div class="order-form-search-wrap">
+              <i class="fas fa-search order-form-search-icon"></i>
+              <input type="text" class="form-control order-form-search-input" id="member_search" placeholder="输入手机号或姓名搜索会员" autocomplete="off">
+              <div id="search_results" class="order-form-search-results d-none"></div>
+            </div>
+            <div id="selected_member" class="order-form-selected-member d-none">
+              <div class="order-form-selected-avatar" id="selected_avatar"></div>
+              <div class="order-form-selected-info">
+                <span class="order-form-selected-name" id="selected_name"></span>
+                <span class="order-form-selected-phone" id="selected_phone"></span>
+              </div>
+              <button type="button" class="order-form-selected-remove" id="remove_member">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <input type="hidden" id="member_id" name="member_id" required>
+          </div>
+        </div>
+
+        <div class="order-form-card">
+          <div class="order-form-section">
+            <div class="order-form-section-title">
+              <i class="fas fa-yen-sign"></i> 订单金额
+            </div>
+            <label class="order-form-label">服务金额</label>
+            <div class="order-form-amount-wrap">
+              <span class="order-form-amount-prefix">¥</span>
+              <input type="number" class="form-control order-form-amount-input" id="amount" name="amount" step="0.01" min="0" required placeholder="0.00">
+            </div>
+            <div class="order-form-quick-amounts">
+              <button type="button" class="order-form-quick-btn" data-amount="28">¥28</button>
+              <button type="button" class="order-form-quick-btn" data-amount="38">¥38</button>
+              <button type="button" class="order-form-quick-btn" data-amount="58">¥58</button>
+              <button type="button" class="order-form-quick-btn" data-amount="88">¥88</button>
+              <button type="button" class="order-form-quick-btn" data-amount="128">¥128</button>
+              <button type="button" class="order-form-quick-btn" data-amount="168">¥168</button>
+            </div>
+          </div>
+
+          <div class="order-form-section">
+            <div class="order-form-section-title">
+              <i class="fas fa-calendar"></i> 订单日期
+            </div>
+            <label class="order-form-label">服务日期</label>
+            <input type="date" class="form-control" id="date" name="date" required>
+          </div>
+
+          <div class="order-form-section">
+            <div class="order-form-section-title">
+              <i class="fas fa-comment-alt"></i> 订单描述
+            </div>
+            <label class="order-form-label">服务描述</label>
+            <input type="text" class="form-control" id="description" name="description" placeholder="例如：剪发+染发">
+          </div>
+
+          <div class="order-form-actions">
+            <button type="submit" class="btn btn-primary order-form-submit-btn">
+              <i class="fas fa-check me-1"></i> 确认添加
+            </button>
+            <a href="/orders" class="btn btn-secondary order-form-cancel-btn">
+              <i class="fas fa-times me-1"></i> 取消
+            </a>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <footer class="footer">
+    <div class="container text-center">
+      <p>&copy; 2026 理发会员管理系统</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var searchInput = document.getElementById('member_search');
+      var searchResults = document.getElementById('search_results');
+      var memberInput = document.getElementById('member_id');
+      var selectedMember = document.getElementById('selected_member');
+      var selectedAvatar = document.getElementById('selected_avatar');
+      var selectedName = document.getElementById('selected_name');
+      var selectedPhone = document.getElementById('selected_phone');
+      var removeBtn = document.getElementById('remove_member');
+      var amountInput = document.getElementById('amount');
+      var dateInput = document.getElementById('date');
+      var quickBtns = document.querySelectorAll('.order-form-quick-btn');
+
+      var today = new Date().toISOString().split('T')[0];
+      dateInput.value = today;
+
+      var membersData = [
+        <% if (members && members.length > 0) { %>
+          <% members.forEach(function(member, index) { %>
+            { id: '<%= member.id %>', name: '<%= member.name %>', phone: '<%= member.phone %>' }<%= index < members.length - 1 ? ',' : '' %>
+          <% }); %>
+        <% } %>
+      ];
+
+      function searchMembers(keyword) {
+        if (!keyword) {
+          searchResults.classList.add('d-none');
+          return;
+        }
+        var filtered = membersData.filter(function(m) {
+          return m.name.indexOf(keyword) !== -1 || m.phone.indexOf(keyword) !== -1;
+        });
+        if (filtered.length === 0) {
+          searchResults.innerHTML = '<div class="order-form-search-item" style="cursor: default; color: var(--text-light);">未找到匹配的会员</div>';
+          searchResults.classList.remove('d-none');
+          return;
+        }
+        searchResults.innerHTML = filtered.map(function(m) {
+          return '<div class="order-form-search-item" data-id="' + m.id + '" data-name="' + m.name + '" data-phone="' + m.phone + '">' +
+            '<div class="order-form-search-avatar">' + m.name.charAt(0) + '</div>' +
+            '<div class="order-form-search-info">' +
+              '<span class="order-form-search-name">' + m.name + '</span>' +
+              '<span class="order-form-search-phone">' + m.phone + '</span>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+        searchResults.classList.remove('d-none');
+
+        searchResults.querySelectorAll('.order-form-search-item[data-id]').forEach(function(item) {
+          item.addEventListener('click', function() {
+            selectMember(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-phone'));
+          });
+        });
+      }
+
+      function selectMember(id, name, phone) {
+        memberInput.value = id;
+        selectedAvatar.textContent = name.charAt(0);
+        selectedName.textContent = name;
+        selectedPhone.textContent = phone;
+        selectedMember.classList.remove('d-none');
+        searchInput.value = '';
+        searchResults.classList.add('d-none');
+        searchInput.setAttribute('disabled', 'disabled');
+      }
+
+      removeBtn.addEventListener('click', function() {
+        memberInput.value = '';
+        selectedMember.classList.add('d-none');
+        searchInput.removeAttribute('disabled');
+        searchInput.focus();
+      });
+
+      var debounceTimer;
+      searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function() {
+          searchMembers(searchInput.value.trim());
+        }, 200);
+      });
+
+      searchInput.addEventListener('focus', function() {
+        if (searchInput.value.trim()) {
+          searchMembers(searchInput.value.trim());
+        }
+      });
+
+      document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+          searchResults.classList.add('d-none');
+        }
+      });
+
+      quickBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          quickBtns.forEach(function(b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          amountInput.value = btn.getAttribute('data-amount');
+        });
+      });
+
+      amountInput.addEventListener('input', function() {
+        quickBtns.forEach(function(b) {
+          if (b.getAttribute('data-amount') === amountInput.value) {
+            b.classList.add('active');
+          } else {
+            b.classList.remove('active');
+          }
+        });
+      });
+    });
+  </script>
+  <script src="/confirm.js"></script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>预约管理 - 理发会员管理系统</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="/">理发会员管理系统</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">
+              <i class="fas fa-home me-1"></i> 首页
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/members">
+              <i class="fas fa-users me-1"></i> 会员管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/appointments">
+              <i class="fas fa-calendar-alt me-1"></i> 预约管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/transactions">
+              <i class="fas fa-receipt me-1"></i> 消费记录
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/orders">
+              <i class="fas fa-shopping-cart me-1"></i> 订单管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/balance">
+              <i class="fas fa-wallet me-1"></i> 余额管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/stats">
+              <i class="fas fa-chart-bar me-1"></i> 数据统计
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link logout-link" href="/logout" onclick="return confirmAction(this, '确定要退出登录吗？', 'logout');">
+              <i class="fas fa-sign-out-alt me-1"></i> 退出登录
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container appt-container">
+    <div class="appt-header">
+      <div>
+        <h1 class="appt-page-title">预约管理</h1>
+        <p class="appt-subtitle">管理会员预约信息，安排服务时间</p>
+      </div>
+      <div>
+        <a href="/appointments/add" class="btn btn-primary">
+          <i class="fas fa-plus me-1"></i> 添加预约
+        </a>
+      </div>
+    </div>
+
+    <%
+      var totalCount = appointments ? appointments.length : 0;
+      var pendingCount = appointments ? appointments.filter(function(a) { return a.status === '待确认'; }).length : 0;
+      var confirmedCount = appointments ? appointments.filter(function(a) { return a.status === '已确认'; }).length : 0;
+      var todayStr = new Date().toISOString().split('T')[0];
+      var todayCount = appointments ? appointments.filter(function(a) { return a.date === todayStr; }).length : 0;
+    %>
+
+    <div class="appt-kpi-row">
+      <div class="appt-kpi-card appt-kpi-gold">
+        <div class="appt-kpi-decoration"></div>
+        <div class="appt-kpi-icon">
+          <i class="fas fa-calendar-alt"></i>
+        </div>
+        <div class="appt-kpi-content">
+          <span class="appt-kpi-label">全部预约</span>
+          <span class="appt-kpi-value"><%= totalCount %></span>
+        </div>
+      </div>
+      <div class="appt-kpi-card appt-kpi-amber">
+        <div class="appt-kpi-decoration"></div>
+        <div class="appt-kpi-icon">
+          <i class="fas fa-hourglass-half"></i>
+        </div>
+        <div class="appt-kpi-content">
+          <span class="appt-kpi-label">待确认</span>
+          <span class="appt-kpi-value"><%= pendingCount %></span>
+        </div>
+      </div>
+      <div class="appt-kpi-card appt-kpi-emerald">
+        <div class="appt-kpi-decoration"></div>
+        <div class="appt-kpi-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="appt-kpi-content">
+          <span class="appt-kpi-label">已确认</span>
+          <span class="appt-kpi-value"><%= confirmedCount %></span>
+        </div>
+      </div>
+      <div class="appt-kpi-card appt-kpi-teal">
+        <div class="appt-kpi-decoration"></div>
+        <div class="appt-kpi-icon">
+          <i class="fas fa-calendar-day"></i>
+        </div>
+        <div class="appt-kpi-content">
+          <span class="appt-kpi-label">今日预约</span>
+          <span class="appt-kpi-value"><%= todayCount %></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="appt-toolbar">
+      <div class="appt-search-wrap">
+        <i class="fas fa-search appt-search-icon"></i>
+        <input type="text" class="form-control appt-search-input" id="appt_search" placeholder="搜索会员姓名、服务项目或日期...">
+      </div>
+      <div class="appt-filter-group">
+        <button class="appt-filter-btn active" data-filter="all">全部</button>
+        <button class="appt-filter-btn" data-filter="待确认">待确认</button>
+        <button class="appt-filter-btn" data-filter="已确认">已确认</button>
+      </div>
+    </div>
+
+    <div class="appt-table-card">
+      <div class="appt-table-wrap">
+        <table class="appt-table">
+          <thead>
+            <tr>
+              <th>预约编号</th>
+              <th>会员信息</th>
+              <th>预约日期</th>
+              <th>预约时间</th>
+              <th>服务项目</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="appt_tbody">
+            <% if (appointments && appointments.length > 0) { %>
+              <% appointments.forEach(function(appointment, index) { %>
+                <tr class="appt-row" data-status="<%= appointment.status %>" data-search="<%= appointment.member_name %> <%= appointment.service %> <%= appointment.date %> <%= appointment.time %>" style="animation-delay: <%= index * 0.05 %>s;">
+                  <td>
+                    <span class="appt-id-cell">#<%= appointment.id %></span>
+                  </td>
+                  <td>
+                    <div class="appt-member-cell">
+                      <div class="appt-avatar" style="background: linear-gradient(135deg, #C9A067, #B8860B);">
+                        <%= appointment.member_name ? appointment.member_name.charAt(0) : '?' %>
+                      </div>
+                      <div class="appt-member-info">
+                        <span class="appt-member-name"><%= appointment.member_name %></span>
+                        <span class="appt-member-id">ID: <%= appointment.member_id %></span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="appt-date"><%= appointment.date %></span>
+                  </td>
+                  <td>
+                    <span class="appt-time">
+                      <i class="fas fa-clock me-1"></i><%= appointment.time %>
+                    </span>
+                  </td>
+                  <td>
+                    <span class="appt-service"><%= appointment.service %></span>
+                  </td>
+                  <td>
+                    <% if (appointment.status === '待确认') { %>
+                      <span class="appt-status appt-status-pending">
+                        <i class="fas fa-circle"></i> 待确认
+                      </span>
+                    <% } else { %>
+                      <span class="appt-status appt-status-confirmed">
+                        <i class="fas fa-circle"></i> 已确认
+                      </span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <div class="d-flex gap-2 justify-content-center">
+                      <% if (appointment.status === '待确认') { %>
+                        <a href="/appointments/confirm/<%= appointment.id %>" class="btn btn-success btn-sm appt-action-btn" onclick="return confirmAction(this, '确定要确认这个预约吗？', 'warning');">
+                          <i class="fas fa-check me-1"></i> 确认
+                        </a>
+                      <% } %>
+                      <a href="/appointments/delete/<%= appointment.id %>" class="btn btn-danger btn-sm appt-action-btn" onclick="return confirmAction(this, '确定要删除这个预约吗？', 'danger');">
+                        <i class="fas fa-trash me-1"></i> 删除
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              <% }); %>
+            <% } %>
+            <tr id="appt_empty_row" style="display: <%= appointments && appointments.length > 0 ? 'none' : 'table-row' %>;">
+              <td colspan="7">
+                <div class="appt-empty">
+                  <div class="appt-empty-icon">
+                    <i class="fas fa-calendar-times"></i>
+                  </div>
+                  <div class="appt-empty-title">暂无预约记录</div>
+                  <div class="appt-empty-desc">点击上方按钮添加第一个预约</div>
+                  <a href="/appointments/add" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i> 添加预约
+                  </a>
+                </div>
+              </td>
+            </tr>
+            <tr id="appt_filter_empty_row" style="display: none;">
+              <td colspan="7">
+                <div class="appt-filter-empty">
+                  <span>没有匹配的预约记录</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container text-center">
+      <p>&copy; 2026 理发会员管理系统</p>
+    </div>
+  </footer>
+
+  <script src="/confirm.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var searchInput = document.getElementById('appt_search');
+      var filterBtns = document.querySelectorAll('.appt-filter-btn');
+      var rows = document.querySelectorAll('.appt-row');
+      var emptyRow = document.getElementById('appt_empty_row');
+      var filterEmptyRow = document.getElementById('appt_filter_empty_row');
+      var currentFilter = 'all';
+
+      searchInput.addEventListener('input', function() {
+        filterRows();
+      });
+
+      filterBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          filterBtns.forEach(function(b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          currentFilter = btn.getAttribute('data-filter');
+          filterRows();
+        });
+      });
+
+      function filterRows() {
+        var keyword = searchInput.value.trim().toLowerCase();
+        var visibleCount = 0;
+
+        rows.forEach(function(row) {
+          var status = row.getAttribute('data-status');
+          var searchText = row.getAttribute('data-search').toLowerCase();
+          var matchFilter = currentFilter === 'all' || status === currentFilter;
+          var matchSearch = !keyword || searchText.indexOf(keyword) !== -1;
+          if (matchFilter && matchSearch) {
+            row.style.display = '';
+            visibleCount++;
+          } else {
+            row.style.display = 'none';
+          }
+        });
+
+        emptyRow.style.display = visibleCount === 0 && rows.length === 0 ? '' : 'none';
+        filterEmptyRow.style.display = visibleCount === 0 && rows.length > 0 ? '' : 'none';
+      }
+    });
+  </script>
+</body>
+</html>

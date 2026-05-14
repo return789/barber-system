@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>理发会员管理系统</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #1e3a5f;
+      --secondary-color: #2c5aa0;
+      --accent-color: #34495e;
+      --success-color: #27ae60;
+      --warning-color: #e67e22;
+      --info-color: #3498db;
+      --light-color: #ecf0f1;
+      --dark-color: #2c3e50;
+      --text-color: #2c3e50;
+      --text-light: #7f8c8d;
+    }
+    
+    body {
+      font-family: 'Microsoft YaHei', Arial, sans-serif;
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+    
+    .navbar {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .navbar-brand {
+      font-weight: bold;
+      font-size: 1.5rem;
+      color: white !important;
+    }
+    
+    .nav-link {
+      color: rgba(255,255,255,0.9) !important;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-link:hover,
+    .nav-link.active {
+      color: white !important;
+      background-color: rgba(255,255,255,0.1);
+      border-radius: 5px;
+    }
+    
+    .hero-section {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 80px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmZmZmMTAiPjwvcmVjdD4KPHBhdGggZD0iTTAgNUw1IDBaTTYgNEw0IDZaTS0xIDFMMSAtMVoiIHN0cm9rZT0iI2ZmZmZmZmYwIiBzdHJva2Utd2lkdGg9IjEiPjwvcGF0aD4KPC9zdmc+') repeat;
+      opacity: 0.1;
+    }
+    
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .hero-section h1 {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .hero-section p {
+      font-size: 1.2rem;
+      margin-bottom: 40px;
+      opacity: 0.9;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border: none;
+      padding: 12px 30px;
+      font-weight: 600;
+      border-radius: 30px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-outline-light {
+      border: 2px solid white;
+      color: white;
+      padding: 10px 30px;
+      font-weight: 600;
+      border-radius: 30px;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-outline-light:hover {
+      background-color: white;
+      color: var(--primary-color);
+      transform: translateY(-2px);
+    }
+    
+    .features-section {
+      padding: 80px 0;
+      background-color: var(--light-color);
+    }
+    
+    .features-section h2 {
+      font-size: 2rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 60px;
+      color: var(--dark-color);
+    }
+    
+    .dashboard-card {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+      border: none;
+    }
+    
+    .dashboard-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+    
+    .dashboard-card i {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+    }
+    
+    .dashboard-card h5 {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: var(--dark-color);
+    }
+    
+    .dashboard-card p {
+      color: var(--text-light);
+      margin-bottom: 20px;
+    }
+    
+    .dashboard-card .btn {
+      background-color: white;
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+      font-weight: 600;
+      border-radius: 20px;
+      padding: 8px 20px;
+      transition: all 0.3s ease;
+    }
+    
+    .dashboard-card .btn:hover {
+      background-color: var(--primary-color);
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    .page-title {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--dark-color);
+      margin-bottom: 10px;
+      position: relative;
+      padding-bottom: 15px;
+    }
+    
+    .page-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100px;
+      height: 4px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-radius: 2px;
+    }
+    
+    .card {
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      border: none;
+      overflow: hidden;
+    }
+    
+    .card-body {
+      padding: 30px;
+    }
+    
+    .table {
+      margin-bottom: 0;
+    }
+    
+    .table-hover tbody tr:hover {
+      background-color: rgba(102, 126, 234, 0.05);
+    }
+    
+    .table thead {
+      background-color: rgba(102, 126, 234, 0.1);
+    }
+    
+    .table th {
+      font-weight: 600;
+      color: var(--dark-color);
+      border-bottom: 2px solid var(--primary-color);
+    }
+    
+    .btn {
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-success {
+      background-color: var(--success-color);
+      border: none;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    }
+    
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    }
+    
+    .btn-danger {
+      background-color: #dc3545;
+      border: none;
+      box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    }
+    
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+    }
+    
+    .btn-secondary {
+      background-color: #6c757d;
+      border: none;
+      box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+    }
+    
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+    }
+    
+    .badge {
+      font-weight: 600;
+      padding: 0.5em 0.75em;
+      border-radius: 20px;
+    }
+    
+    .badge-primary {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    }
+    
+    .badge-success {
+      background-color: var(--success-color);
+    }
+    
+    .footer {
+      background: var(--dark-color);
+      color: white;
+      padding: 40px 0;
+      margin-top: 60px;
+    }
+    
+    .footer p {
+      margin: 0;
+      opacity: 0.8;
+    }
+    
+    .pagination {
+      justify-content: center;
+    }
+    
+    .pagination .page-item.active .page-link {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-color: var(--primary-color);
+    }
+    
+    .pagination .page-link {
+      color: var(--primary-color);
+      transition: all 0.3s ease;
+    }
+    
+    .pagination .page-link:hover {
+      color: var(--secondary-color);
+      transform: translateY(-1px);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      font-weight: 600;
+      color: var(--dark-color);
+    }
+    
+    .form-control {
+      border-radius: 8px;
+      border: 1px solid #ced4da;
+      padding: 10px 15px;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .login-container {
+      max-width: 500px;
+      margin: 80px auto;
+      padding: 40px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .login-container h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: var(--dark-color);
+    }
+    
+    .login-container .btn {
+      width: 100%;
+      margin-top: 20px;
+    }
+    
+    .page {
+      display: none;
+    }
+    
+    .page.active {
+      display: block;
+    }
+    
+    @media (max-width: 768px) {
+      .hero-section h1 {
+        font-size: 2rem;
+      }
+      
+      .hero-section p {
+        font-size: 1rem;
+      }
+      
+      .features-section {
+        padding: 60px 0;
+      }
+      
+      .dashboard-card {
+        margin-bottom: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="#" onclick="showPage('home')">理发会员管理系统</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#" onclick="showPage('home')">
+              <i class="fas fa-home me-1"></i> 首页
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="showPage('members')">
+              <i class="fas fa-users me-1"></i> 会员管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="showPage('appointments')">
+              <i class="fas fa-calendar-alt me-1"></i> 预约管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="showPage('transactions')">
+              <i class="fas fa-receipt me-1"></i> 消费记录
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="showPage('orders')">
+              <i class="fas fa-shopping-cart me-1"></i> 订单管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="showPage('balance')">
+              <i class="fas fa-wallet me-1"></i> 余额管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="showPage('stats')">
+              <i class="fas fa-chart-bar me-1"></i> 数据统计
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link logout-link" href="#" onclick="return confirm('确定要退出登录吗？');">
+              <i class="fas fa-sign-out-alt me-1"></i> 退出登录
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 首页 -->
+  <div id="home" class="page active">
+    <section class="hero-section">
+      <div class="container text-center hero-content">
+        <h1>欢迎使用理发会员管理系统</h1>
+        <p>高效管理会员信息，预约和消费记录</p>
+        <div class="d-flex justify-content-center gap-4">
+          <a href="#" class="btn btn-primary btn-lg" onclick="showPage('members')">管理会员</a>
+          <a href="#" class="btn btn-outline-light btn-lg" onclick="showPage('appointments')">管理预约</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="features-section">
+      <div class="container">
+        <h2>系统功能</h2>
+        <div class="row g-4">
+          <div class="col-md-3">
+            <div class="dashboard-card">
+              <i class="fas fa-users"></i>
+              <h5>会员管理</h5>
+              <p>添加、编辑、删除会员信息，管理会员档案</p>
+              <a href="#" class="btn" onclick="showPage('members')">查看详情</a>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="dashboard-card">
+              <i class="fas fa-calendar-alt"></i>
+              <h5>预约管理</h5>
+              <p>管理会员预约信息，安排服务时间</p>
+              <a href="#" class="btn" onclick="showPage('appointments')">查看详情</a>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="dashboard-card">
+              <i class="fas fa-receipt"></i>
+              <h5>消费记录</h5>
+              <p>记录会员消费情况，自动计算积分</p>
+              <a href="#" class="btn" onclick="showPage('transactions')">查看详情</a>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="dashboard-card">
+              <i class="fas fa-chart-bar"></i>
+              <h5>数据统计</h5>
+              <p>查看系统数据统计，分析营业情况</p>
+              <a href="#" class="btn" onclick="showPage('stats')">查看详情</a>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="dashboard-card">
+              <i class="fas fa-shopping-cart"></i>
+              <h5>订单管理</h5>
+              <p>管理会员订单，查看订单详情</p>
+              <a href="#" class="btn" onclick="showPage('orders')">查看详情</a>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="dashboard-card">
+              <i class="fas fa-wallet"></i>
+              <h5>余额管理</h5>
+              <p>管理会员余额，支持充值和扣费</p>
+              <a href="#" class="btn" onclick="showPage('balance')">查看详情</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 会员管理 -->
+  <div id="members" class="page">
+    <div class="container">
+      <h1 class="page-title">会员管理</h1>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <p class="text-muted">管理会员信息，包括添加、编辑和删除会员</p>
+        <a href="#" class="btn btn-primary" onclick="showPage('add-member')">
+          <i class="fas fa-plus me-1"></i> 添加会员
+        </a>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>会员编号</th>
+                  <th>姓名</th>
+                  <th>电话</th>
+                  <th>生日</th>
+                  <th>会员等级</th>
+                  <th>积分</th>
+                  <th>余额</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>12</td>
+                  <td>张先生</td>
+                  <td>13812345678</td>
+                  <td>1990-01-01</td>
+                  <td>
+                    <span class="badge badge-primary">普通</span>
+                  </td>
+                  <td>100</td>
+                  <td>¥200.00</td>
+                  <td>
+                    <div class="d-flex gap-2 justify-content-center">
+                      <a href="#" class="btn btn-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i> 编辑
+                      </a>
+                      <a href="#" class="btn btn-success btn-sm" onclick="showPage('edit-balance')">
+                        <i class="fas fa-wallet me-1"></i> 修改余额
+                      </a>
+                      <a href="#" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个会员吗？');">
+                        <i class="fas fa-trash me-1"></i> 删除
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>11</td>
+                  <td>李女士</td>
+                  <td>13987654321</td>
+                  <td>1992-03-15</td>
+                  <td>
+                    <span class="badge badge-primary">高级</span>
+                  </td>
+                  <td>250</td>
+                  <td>¥500.00</td>
+                  <td>
+                    <div class="d-flex gap-2 justify-content-center">
+                      <a href="#" class="btn btn-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i> 编辑
+                      </a>
+                      <a href="#" class="btn btn-success btn-sm" onclick="showPage('edit-balance')">
+                        <i class="fas fa-wallet me-1"></i> 修改余额
+                      </a>
+                      <a href="#" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个会员吗？');">
+                        <i class="fas fa-trash me-1"></i> 删除
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td>王先生</td>
+                  <td>13765432198</td>
+                  <td>1988-06-20</td>
+                  <td>
+                    <span class="badge badge-primary">普通</span>
+                  </td>
+                  <td>80</td>
+                  <td>¥150.00</td>
+                  <td>
+                    <div class="d-flex gap-2 justify-content-center">
+                      <a href="#" class="btn btn-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i> 编辑
+                      </a>
+                      <a href="#" class="btn btn-success btn-sm" onclick="showPage('edit-balance')">
+                        <i class="fas fa-wallet me-1"></i> 修改余额
+                      </a>
+                      <a href="#" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个会员吗？');">
+                        <i class="fas fa-trash me-1"></i> 删除
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td>赵女士</td>
+                  <td>13698765432</td>
+                  <td>1995-09-10</td>
+                  <td>
+                    <span class="badge badge-primary">高级</span>
+                  </td>
+                  <td>320</td>
+                  <td>¥800.00</td>
+                  <td>
+                    <div class="d-flex gap-2 justify-content-center">
+                      <a href="#" class="btn btn-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i> 编辑
+                      </a>
+                      <a href="#" class="btn btn-success btn-sm" onclick="showPage('edit-balance')">
+                        <i class="fas fa-wallet me-1"></i> 修改余额
+                      </a>
+                      <a href="#" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个会员吗？');">
+                        <i class="fas fa-trash me-1"></i> 删除
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>陈先生</td>
+                  <td>13567890123</td>
+                  <td>1991-12-05</td>
+                  <td>
+                    <span class="badge badge-primary">普通</span>
+                  </td>
+                  <td>60</td>
+                  <td>¥100.00</td>
+                  <td>
+                    <div class="d-flex gap-2 justify-content-center">
+                      <a href="#" class="btn btn-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i> 编辑
+                      </a>
+                      <a href="#" class="btn btn-success btn-sm" onclick="showPage('edit-balance')">
+                        <i class="fas fa-wallet me-1"></i> 修改余额
+                      </a>
+                      <a href="#" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个会员吗？');">
+                        <i class="fas fa-trash me-1"></i> 删除
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="mt-4">
+            <nav aria-label="Page navigation">
+              <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                  <a class="page-link" href="#" aria-label="First">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                  </a>
+                </li>
+                <li class="page-item disabled">
+                  <a class="page-link" href="#">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+                <li class="page-item active">
+                  <a class="page-link" href="#">1</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#">2</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#">3</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#" aria-label="Last">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+            <div class="text-center mt-2">
+              <p class="text-muted">
+                共 12 条记录，第 1 / 3 页
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 余额管理 -->
+  <div id="balance" class="page">
+    <div class="container">
+      <h1 class="page-title">余额管理</h1>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <p class="text-muted">管理会员余额，支持充值和扣费操作</p>
+        <a href="#" class="btn btn-secondary" onclick="showPage('members')">
+          <i class="fas fa-arrow-left me-1"></i> 返回会员管理
+        </a>
+      </div>
+      
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>会员编号</th>
+                  <th>会员姓名</th>
+                  <th>电话</th>
+                  <th>余额</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>12</td>
+                  <td>张先生</td>
+                  <td>13812345678</td>
+                  <td>
+                    <span class="badge badge-success">¥200.00</span>
+                  </td>
+                  <td>
+                    <a href="#" class="btn btn-primary btn-sm" onclick="showPage('edit-balance')">
+                      <i class="fas fa-edit me-1"></i> 修改余额
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>11</td>
+                  <td>李女士</td>
+                  <td>13987654321</td>
+                  <td>
+                    <span class="badge badge-success">¥500.00</span>
+                  </td>
+                  <td>
+                    <a href="#" class="btn btn-primary btn-sm" onclick="showPage('edit-balance')">
+                      <i class="fas fa-edit me-1"></i> 修改余额
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td>王先生</td>
+                  <td>13765432198</td>
+                  <td>
+                    <span class="badge badge-success">¥150.00</span>
+                  </td>
+                  <td>
+                    <a href="#" class="btn btn-primary btn-sm" onclick="showPage('edit-balance')">
+                      <i class="fas fa-edit me-1"></i> 修改余额
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td>赵女士</td>
+                  <td>13698765432</td>
+                  <td>
+                    <span class="badge badge-success">¥800.00</span>
+                  </td>
+                  <td>
+                    <a href="#" class="btn btn-primary btn-sm" onclick="showPage('edit-balance')">
+                      <i class="fas fa-edit me-1"></i> 修改余额
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>陈先生</td>
+                  <td>13567890123</td>
+                  <td>
+                    <span class="badge badge-success">¥100.00</span>
+                  </td>
+                  <td>
+                    <a href="#" class="btn btn-primary btn-sm" onclick="showPage('edit-balance')">
+                      <i class="fas fa-edit me-1"></i> 修改余额
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="mt-4">
+            <nav aria-label="Page navigation">
+              <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                  <a class="page-link" href="#" aria-label="First">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                  </a>
+                </li>
+                <li class="page-item disabled">
+                  <a class="page-link" href="#">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+                <li class="page-item active">
+                  <a class="page-link" href="#">1</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#">2</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#">3</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#" aria-label="Last">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+            <div class="text-center mt-2">
+              <p class="text-muted">
+                共 12 条记录，第 1 / 3 页
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 预约管理 -->
+  <div id="appointments" class="page">
+    <div class="container">
+      <h1 class="page-title">预约管理</h1>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <p class="text-muted">管理会员预约信息，安排服务时间</p>
+        <a href="#" class="btn btn-primary">
+          <i class="fas fa-plus me-1"></i> 添加预约
+        </a>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>预约编号</th>
+                  <th>会员姓名</th>
+                  <th>电话</th>
+                  <th>预约日期</th>
+                  <th>预约时间</th>
+                  <th>服务类型</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>张先生</td>
+                  <td>13812345678</td>
+                  <td>2026-03-18</td>
+                  <td>10:00</td>
+                  <td>剪发</td>
+                  <td>
+                    <span class="badge badge-primary">待确认</span>
+                  </td>
+                  <td>
+                    <div class="d-flex gap-2 justify-content-center">
+                      <a href="#" class="btn btn-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i> 编辑
+                      </a>
+                      <a href="#" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个预约吗？');">
+                        <i class="fas fa-trash me-1"></i> 删除
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>李女士</td>
+                  <td>13987654321</td>
+                  <td>2026-03-19</td>
+                  <td>14:30</td>
+                  <td>染发</td>
+                  <td>
+                    <span class="badge badge-success">已确认</span>
+                  </td>
+                  <td>
+                    <div class="d-flex gap-2 justify-content-center">
+                      <a href="#" class="btn btn-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i> 编辑
+                      </a>
+                      <a href="#" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个预约吗？');">
+                        <i class="fas fa-trash me-1"></i> 删除
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 消费记录 -->
+  <div id="transactions" class="page">
+    <div class="container">
+      <h1 class="page-title">消费记录</h1>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <p class="text-muted">记录会员消费情况，自动计算积分</p>
+        <a href="#" class="btn btn-primary">
+          <i class="fas fa-plus me-1"></i> 添加记录
+        </a>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>记录编号</th>
+                  <th>会员姓名</th>
+                  <th>消费金额</th>
+                  <th>消费日期</th>
+                  <th>消费项目</th>
+                  <th>积分</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>张先生</td>
+                  <td>¥50.00</td>
+                  <td>2026-03-15</td>
+                  <td>剪发</td>
+                  <td>5</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>李女士</td>
+                  <td>¥120.00</td>
+                  <td>2026-03-16</td>
+                  <td>染发</td>
+                  <td>12</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 订单管理 -->
+  <div id="orders" class="page">
+    <div class="container">
+      <h1 class="page-title">订单管理</h1>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <p class="text-muted">管理会员订单，查看订单详情</p>
+        <a href="#" class="btn btn-primary">
+          <i class="fas fa-plus me-1"></i> 添加订单
+        </a>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>订单编号</th>
+                  <th>会员姓名</th>
+                  <th>订单金额</th>
+                  <th>订单日期</th>
+                  <th>描述</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>张先生</td>
+                  <td>¥50.00</td>
+                  <td>2026-03-17</td>
+                  <td>剪发服务</td>
+                  <td>
+                    <span class="badge badge-warning">待处理</span>
+                  </td>
+                  <td>
+                    <a href="#" class="btn btn-primary btn-sm">
+                      <i class="fas fa-check me-1"></i> 处理订单
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>李女士</td>
+                  <td>¥120.00</td>
+                  <td>2026-03-17</td>
+                  <td>染发服务</td>
+                  <td>
+                    <span class="badge badge-success">已完成</span>
+                  </td>
+                  <td>
+                    <a href="#" class="btn btn-secondary btn-sm" disabled>
+                      <i class="fas fa-check me-1"></i> 已处理
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 数据统计 -->
+  <div id="stats" class="page">
+    <div class="container">
+      <h1 class="page-title">数据统计</h1>
+      <p class="text-muted mb-4">查看系统数据统计，分析营业情况</p>
+
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-body text-center">
+              <i class="fas fa-users text-3xl text-primary mb-3"></i>
+              <h5 class="card-title">会员总数</h5>
+              <p class="card-text display-4">12</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-body text-center">
+              <i class="fas fa-receipt text-3xl text-success mb-3"></i>
+              <h5 class="card-title">今日消费</h5>
+              <p class="card-text display-4">¥170.00</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-body text-center">
+              <i class="fas fa-calendar-alt text-3xl text-info mb-3"></i>
+              <h5 class="card-title">今日预约</h5>
+              <p class="card-text display-4">2</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-body">
+          <h5 class="card-title mb-3">消费统计</h5>
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>月份</th>
+                  <th>消费金额</th>
+                  <th>会员数量</th>
+                  <th>订单数量</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2026-03</td>
+                  <td>¥1,200.00</td>
+                  <td>12</td>
+                  <td>25</td>
+                </tr>
+                <tr>
+                  <td>2026-02</td>
+                  <td>¥980.00</td>
+                  <td>10</td>
+                  <td>20</td>
+                </tr>
+                <tr>
+                  <td>2026-01</td>
+                  <td>¥1,500.00</td>
+                  <td>10</td>
+                  <td>30</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 添加会员 -->
+  <div id="add-member" class="page">
+    <div class="container">
+      <h1 class="page-title">添加会员</h1>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <p class="text-muted">添加新的会员信息</p>
+        <a href="#" class="btn btn-secondary" onclick="showPage('members')">
+          <i class="fas fa-arrow-left me-1"></i> 返回会员管理
+        </a>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <form>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="name" class="form-label">姓名</label>
+                  <input type="text" class="form-control" id="name" placeholder="请输入会员姓名">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="phone" class="form-label">电话</label>
+                  <input type="tel" class="form-control" id="phone" placeholder="请输入会员电话">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="birthday" class="form-label">生日</label>
+                  <input type="date" class="form-control" id="birthday">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="level" class="form-label">会员等级</label>
+                  <select class="form-control" id="level">
+                    <option value="普通">普通</option>
+                    <option value="高级">高级</option>
+                    <option value="VIP">VIP</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="points" class="form-label">积分</label>
+                  <input type="number" class="form-control" id="points" placeholder="请输入会员积分" value="0">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="balance" class="form-label">余额</label>
+                  <input type="number" class="form-control" id="balance" placeholder="请输入会员余额" value="0" step="0.01">
+                </div>
+              </div>
+            </div>
+            <div class="mt-4">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-1"></i> 保存
+              </button>
+              <a href="#" class="btn btn-secondary ms-2" onclick="showPage('members')">
+                <i class="fas fa-times me-1"></i> 取消
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 修改余额 -->
+  <div id="edit-balance" class="page">
+    <div class="container">
+      <h1 class="page-title">修改余额</h1>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <p class="text-muted">为会员充值或扣费</p>
+        <a href="#" class="btn btn-secondary" onclick="showPage('balance')">
+          <i class="fas fa-arrow-left me-1"></i> 返回余额管理
+        </a>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div class="mb-4">
+            <h5>会员信息</h5>
+            <p>姓名：张先生</p>
+            <p>电话：13812345678</p>
+            <p>当前余额：¥200.00</p>
+          </div>
+          <form>
+            <div class="form-group">
+              <label for="amount" class="form-label">金额</label>
+              <input type="number" class="form-control" id="amount" placeholder="请输入金额" step="0.01">
+            </div>
+            <div class="form-group">
+              <label for="type" class="form-label">操作类型</label>
+              <select class="form-control" id="type">
+                <option value="充值">充值</option>
+                <option value="扣费">扣费</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="description" class="form-label">备注</label>
+              <textarea class="form-control" id="description" rows="3" placeholder="请输入备注信息"></textarea>
+            </div>
+            <div class="mt-4">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-1"></i> 确认
+              </button>
+              <a href="#" class="btn btn-secondary ms-2" onclick="showPage('balance')">
+                <i class="fas fa-times me-1"></i> 取消
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container text-center">
+      <p>&copy; 2026 理发会员管理系统</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function showPage(pageId) {
+      // 隐藏所有页面
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+      });
+      
+      // 显示选中的页面
+      document.getElementById(pageId).classList.add('active');
+      
+      // 更新导航菜单的激活状态
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+      });
+      
+      // 找到对应的导航链接并激活
+      const navLinks = document.querySelectorAll('.nav-link');
+      navLinks.forEach(link => {
+        if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(pageId)) {
+          link.classList.add('active');
+        }
+      });
+      
+      // 对于首页特殊处理
+      if (pageId === 'home') {
+        navLinks[0].classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>

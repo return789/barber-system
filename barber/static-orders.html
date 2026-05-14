@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>订单管理 - 理发会员管理系统</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #1e3a5f;
+      --secondary-color: #2c5aa0;
+      --accent-color: #34495e;
+      --success-color: #27ae60;
+      --warning-color: #e67e22;
+      --info-color: #3498db;
+      --light-color: #ecf0f1;
+      --dark-color: #2c3e50;
+      --text-color: #2c3e50;
+      --text-light: #7f8c8d;
+    }
+    
+    body {
+      font-family: 'Microsoft YaHei', Arial, sans-serif;
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+    
+    .navbar {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .navbar-brand {
+      font-weight: bold;
+      font-size: 1.5rem;
+      color: white !important;
+    }
+    
+    .nav-link {
+      color: rgba(255,255,255,0.9) !important;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-link:hover,
+    .nav-link.active {
+      color: white !important;
+      background-color: rgba(255,255,255,0.1);
+      border-radius: 5px;
+    }
+    
+    .page-title {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--dark-color);
+      margin-bottom: 10px;
+      position: relative;
+      padding-bottom: 15px;
+    }
+    
+    .page-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100px;
+      height: 4px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-radius: 2px;
+    }
+    
+    .card {
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      border: none;
+      overflow: hidden;
+    }
+    
+    .card-body {
+      padding: 30px;
+    }
+    
+    .table {
+      margin-bottom: 0;
+    }
+    
+    .table-hover tbody tr:hover {
+      background-color: rgba(102, 126, 234, 0.05);
+    }
+    
+    .table thead {
+      background-color: rgba(102, 126, 234, 0.1);
+    }
+    
+    .table th {
+      font-weight: 600;
+      color: var(--dark-color);
+      border-bottom: 2px solid var(--primary-color);
+    }
+    
+    .btn {
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border: none;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-success {
+      background-color: var(--success-color);
+      border: none;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    }
+    
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    }
+    
+    .btn-danger {
+      background-color: #dc3545;
+      border: none;
+      box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    }
+    
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+    }
+    
+    .btn-secondary {
+      background-color: #6c757d;
+      border: none;
+      box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+    }
+    
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+    }
+    
+    .badge {
+      font-weight: 600;
+      padding: 0.5em 0.75em;
+      border-radius: 20px;
+    }
+    
+    .badge-primary {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    }
+    
+    .badge-success {
+      background-color: var(--success-color);
+    }
+    
+    .badge-warning {
+      background-color: var(--warning-color);
+    }
+    
+    .footer {
+      background: var(--dark-color);
+      color: white;
+      padding: 40px 0;
+      margin-top: 60px;
+    }
+    
+    .footer p {
+      margin: 0;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="static-index.html">理发会员管理系统</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="static-index.html">
+              <i class="fas fa-home me-1"></i> 首页
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="static-members.html">
+              <i class="fas fa-users me-1"></i> 会员管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="static-appointments.html">
+              <i class="fas fa-calendar-alt me-1"></i> 预约管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="static-transactions.html">
+              <i class="fas fa-receipt me-1"></i> 消费记录
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="static-orders.html">
+              <i class="fas fa-shopping-cart me-1"></i> 订单管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="static-balance.html">
+              <i class="fas fa-wallet me-1"></i> 余额管理
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="static-stats.html">
+              <i class="fas fa-chart-bar me-1"></i> 数据统计
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link logout-link" href="static-login.html" onclick="return confirm('确定要退出登录吗？');">
+              <i class="fas fa-sign-out-alt me-1"></i> 退出登录
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1 class="page-title">订单管理</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <p class="text-muted">管理会员订单，查看订单详情</p>
+      <a href="static-add-order.html" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i> 添加订单
+      </a>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>订单编号</th>
+                <th>会员姓名</th>
+                <th>金额</th>
+                <th>日期</th>
+                <th>描述</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>10</td>
+                <td>张先生</td>
+                <td>¥50.00</td>
+                <td>2026-03-17</td>
+                <td>理发</td>
+                <td>
+                  <span class="badge badge-warning">待处理</span>
+                </td>
+                <td>
+                  <a href="static-process-order.html" class="btn btn-success btn-sm">
+                    <i class="fas fa-check-circle me-1"></i> 处理订单
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td>9</td>
+                <td>李女士</td>
+                <td>¥120.00</td>
+                <td>2026-03-16</td>
+                <td>烫发</td>
+                <td>
+                  <span class="badge badge-warning">待处理</span>
+                </td>
+                <td>
+                  <a href="static-process-order.html" class="btn btn-success btn-sm">
+                    <i class="fas fa-check-circle me-1"></i> 处理订单
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td>王先生</td>
+                <td>¥30.00</td>
+                <td>2026-03-15</td>
+                <td>刮胡</td>
+                <td>
+                  <span class="badge badge-success">已处理</span>
+                </td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" disabled>
+                    <i class="fas fa-check-circle me-1"></i> 已处理
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>赵女士</td>
+                <td>¥80.00</td>
+                <td>2026-03-14</td>
+                <td>染发</td>
+                <td>
+                  <span class="badge badge-success">已处理</span>
+                </td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" disabled>
+                    <i class="fas fa-check-circle me-1"></i> 已处理
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>陈先生</td>
+                <td>¥45.00</td>
+                <td>2026-03-13</td>
+                <td>理发 + 造型</td>
+                <td>
+                  <span class="badge badge-success">已处理</span>
+                </td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" disabled>
+                    <i class="fas fa-check-circle me-1"></i> 已处理
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container text-center">
+      <p>&copy; 2026 理发会员管理系统</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
